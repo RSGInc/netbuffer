@@ -1,0 +1,5 @@
+Description,Target,Expression
+#,,
+total employment 1000 m,emptot_p,"distance = 1000, type=sum, decay=exponential, name=target"
+total education employment 1000m,empedu_p,"distance = 1000, type=sum, decay=exponential, name=target"
+total food employment 1000m,empfoo_p,"distance = 1000, type=sum, decay=exponential, name=target"

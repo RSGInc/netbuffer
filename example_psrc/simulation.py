@@ -1,9 +1,11 @@
+
 import orca
 from activitysim import abm
 from activitysim.core import tracing
 import pandas as pd
 import numpy as np
 import os
+os.chdir(r"D:\Stefan\actvitysim_develop\activitysim\example_psrc")
 
 from activitysim.core.tracing import print_elapsed_time
 
@@ -22,20 +24,9 @@ t0 = print_elapsed_time()
 
 _MODELS = [
     'compute_accessibility',
-    'buffer_parcels',
-    'school_location_simulate',
-    'workplace_location_simulate',
-    'auto_ownership_simulate',
-    'cdap_simulate',
-    'mandatory_tour_frequency',
-    'mandatory_scheduling',
-    'non_mandatory_tour_frequency',
-    'destination_choice',
-    'non_mandatory_scheduling',
-    'tour_mode_choice_simulate',
-    'create_simple_trips',
-    'trip_mode_choice_simulate'
+    'buffer_parcels'
 ]
+
 
 
 # If you provide a resume_after argument to pipeline.run
@@ -45,6 +36,7 @@ resume_after = None
 # resume_after = 'mandatory_scheduling'
 
 pipeline.run(models=_MODELS, resume_after=resume_after)
+
 
 print "\n#### run completed"
 

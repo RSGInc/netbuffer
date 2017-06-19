@@ -16,19 +16,23 @@ from activitysim.core import config
 
 logger = logging.getLogger(__name__)
 
-#@orca.injectable()
-#def buffer_parcels_spec(configs_dir):
-#    f = os.path.join(configs_dir, 'accessibility.csv')
-#    return assign.read_assignment_spec(f)
+@orca.injectable()
+def buffer_parcels_spec(configs_dir):
+    f = os.path.join(configs_dir, 'buffering.csv')
+    return assign.read_assignment_spec(f)
 
 
 @orca.injectable()
 def buffer_parcels_settings(configs_dir):
     return config.read_model_settings(configs_dir, 'buffer_parcels.yaml')
 
+@orca.table()
+def processed(raw_data):
+    # do fancy stuff
+    return processed_data
 
 @orca.step()
-def buffer_parcels(settings, buffer_parcels_settings, parcel_data, data_dir):
+def buffer_parcels(settings, buffer_parcels_spec, buffer_parcels_settings, parcel_data, data_dir):
 
     """
     Compute accessibility for each zone in land use file using expressions from accessibility_spec
@@ -54,74 +58,31 @@ def buffer_parcels(settings, buffer_parcels_settings, parcel_data, data_dir):
     network = pdna.Network.from_hdf5(fname)
     
     parcel_data_df = parcel_data.to_frame()
+    parcel_data_df.reset_index(level = 0, inplace = True)
+ 
+    # attach the node_id of the nearest network node to each parcel
+    parcel_data_df['node_id'] = network.get_node_ids(parcel_data_df['xcoord_p'].values, parcel_data_df['ycoord_p'].values)
 
+    locals_d = {
+        'network': network,
+        'factor' : 3,
+        'sum' : 'sum',
+        'exponential' : 'exponential',
+    }
+    if constants is not None:
+        locals_d.update(constants)
 
+    l = {}
+    for e in zip(buffer_parcels_spec.target, buffer_parcels_spec.expression):
+        target, expression = e
+        locals_d['target'] = target 
+        my_exp = 'network.aggregate(' + expression + ')'
+        network.set(parcel_data_df['node_id'], variable=parcel_data_df[target], name=target)
+        x = eval(my_exp, globals(), locals_d)
+        logger.info(x)
 
+        l[target] = x 
+    buffered_parcels = pd.DataFrame(l)
+    buffered_parcels.to_csv(r'D:\stefan\buff_parcels.csv')
 
-    #land_use_columns = accessibility_settings.get('land_use_columns', [])
-
-    #land_use_df = land_use.to_frame()
-    #parcel_data_df = parcel_data.to_frame()
-
-    #zone_count = len(land_use_df.index)
-
-    ## create OD dataframe
-    #od_df = pd.DataFrame(
-    #    data={
-    #        'orig': np.repeat(np.asanyarray(land_use_df.index), zone_count),
-    #        'dest': np.tile(np.asanyarray(land_use_df.index), zone_count)
-    #    }
-    #)
-
-    #if trace_od:
-    #    trace_orig, trace_dest = trace_od
-    #    trace_od_rows = (od_df.orig == trace_orig) & (od_df.dest == trace_dest)
-    #else:
-    #    trace_od_rows = None
-
-    ## merge land_use_columns into od_df
-    #land_use_df = land_use_df[land_use_columns]
-    #od_df = pd.merge(od_df, land_use_df, left_on='dest', right_index=True).sort_index()
-
-    #locals_d = {
-    #    'log': np.log,
-    #    'exp': np.exp,
-    #    'skim_od': AccessibilitySkims(skim_dict, omx_file, zone_count),
-    #    'skim_do': AccessibilitySkims(skim_dict, omx_file, zone_count, transpose=True)
-    #}
-    #if constants is not None:
-    #    locals_d.update(constants)
-
-    #results, trace_results, trace_assigned_locals \
-    #    = assign.assign_variables(accessibility_spec, od_df, locals_d, trace_rows=trace_od_rows)
-    #accessibility_df = pd.DataFrame(index=land_use.index)
-    #for column in results.columns:
-    #    data = np.asanyarray(results[column])
-    #    data.shape = (zone_count, zone_count)
-    #    accessibility_df[column] = np.log(np.sum(data, axis=1) + 1)
-
-    #    orca.add_column("accessibility", column, accessibility_df[column])
-
-    #if trace_od:
-
-    #    if not trace_od_rows.any():
-    #        logger.warn("trace_od not found origin = %s, dest = %s" % (trace_orig, trace_dest))
-    #    else:
-
-    #        # add OD columns to trace results
-    #        df = pd.concat([od_df[trace_od_rows], trace_results], axis=1)
-
-    #        # dump the trace results table (with _temp variables) to aid debugging
-    #        # note that this is not the same as the orca-injected accessibility table
-    #        # FIXME - should we name this differently and also dump the updated accessibility table?
-    #        tracing.trace_df(df,
-    #                         label='accessibility',
-    #                         index_label='skim_offset',
-    #                         slicer='NONE',
-    #                         warn_if_empty=True)
-
-    #        if trace_assigned_locals:
-    #            tracing.write_locals(df, file_name="accessibility_locals")
-
-    #    tracing.trace_df(orca.get_table('persons_merged').to_frame(), "persons_merged",
-    #                     warn_if_empty=True)
+        
