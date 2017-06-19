@@ -76,7 +76,7 @@ def buffer_parcels(settings, buffer_parcels_spec, buffer_parcels_settings, parce
     for e in zip(buffer_parcels_spec.target, buffer_parcels_spec.expression):
         target, expression = e
         locals_d['target'] = target 
-        my_exp = 'network.aggregate(' + expression + ')'
+        my_exp = 'network.aggregate(%s)'%(expression)
         network.set(parcel_data_df['node_id'], variable=parcel_data_df[target], name=target)
         x = eval(my_exp, globals(), locals_d)
         logger.info(x)
