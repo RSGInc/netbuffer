@@ -26,10 +26,6 @@ def buffer_parcels_spec(configs_dir):
 def buffer_parcels_settings(configs_dir):
     return config.read_model_settings(configs_dir, 'buffer_parcels.yaml')
 
-@orca.table()
-def processed(raw_data):
-    # do fancy stuff
-    return processed_data
 
 @orca.step()
 def buffer_parcels(settings, buffer_parcels_spec, buffer_parcels_settings, parcel_data, data_dir):
@@ -69,6 +65,7 @@ def buffer_parcels(settings, buffer_parcels_spec, buffer_parcels_settings, parce
         'sum' : 'sum',
         'exponential' : 'exponential',
     }
+    
     if constants is not None:
         locals_d.update(constants)
 
@@ -79,10 +76,12 @@ def buffer_parcels(settings, buffer_parcels_spec, buffer_parcels_settings, parce
         my_exp = 'network.aggregate(%s)'%(expression)
         network.set(parcel_data_df['node_id'], variable=parcel_data_df[target], name=target)
         x = eval(my_exp, globals(), locals_d)
-        logger.info(x)
-
         l[target] = x 
-    buffered_parcels = pd.DataFrame(l)
-    buffered_parcels.to_csv(r'D:\stefan\buff_parcels.csv')
 
+    buffered_parcels = pd.DataFrame(l)
+    tracing.trace_df(buffered_parcels,
+                             label='buffered_parcels',
+                             index_label='None',
+                             slicer='NONE',
+                             transpose = False)
         
