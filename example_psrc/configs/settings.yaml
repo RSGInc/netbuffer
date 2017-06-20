@@ -2,6 +2,7 @@
 store: mtc_asim.h5
 skims_file: skims.omx
 buffer_network: pandana_network.h5
+transit_stops: transit_stops.csv
 #number of households to simulate
 households_sample_size: 100
 

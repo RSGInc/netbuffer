@@ -50,9 +50,17 @@ def buffer_parcels(settings, buffer_parcels_spec, buffer_parcels_settings, parce
 
     constants = config.get_model_constants(buffer_parcels_settings)
 
-    fname = os.path.join(data_dir, settings["buffer_network"])
-    network = pdna.Network.from_hdf5(fname)
-    
+    net_fname = os.path.join(data_dir, settings["buffer_network"])
+    network = pdna.Network.from_hdf5(net_fname)
+    network.init_pois(num_categories=1, max_dist=2000, max_pois=10)
+
+    # TO-FIX-reading the following df directly for now since easier table reading is being added.
+    # this table provides the location of transit stops and types of transit they serve
+    # used to find distance from parcels to nearest bus, light rail, commuter rail etc.
+    # also- might be better to store in the master h5 file.  
+    poi_fname = net_fname = os.path.join(data_dir, settings["transit_stops"])
+    poi_df = pd.read_csv(poi_fname, index_col = False)
+
     parcel_data_df = parcel_data.to_frame()
     parcel_data_df.reset_index(level = 0, inplace = True)
  
@@ -62,24 +70,15 @@ def buffer_parcels(settings, buffer_parcels_spec, buffer_parcels_settings, parce
     locals_d = {
         'network': network,
         'factor' : 3,
-        'sum' : 'sum',
-        'exponential' : 'exponential',
     }
     
     if constants is not None:
         locals_d.update(constants)
 
-    l = {}
-    for e in zip(buffer_parcels_spec.target, buffer_parcels_spec.expression):
-        target, expression = e
-        locals_d['target'] = target 
-        my_exp = 'network.aggregate(%s)'%(expression)
-        network.set(parcel_data_df['node_id'], variable=parcel_data_df[target], name=target)
-        x = eval(my_exp, globals(), locals_d)
-        l[target] = x 
-
-    buffered_parcels = pd.DataFrame(l)
-    tracing.trace_df(buffered_parcels,
+    results, trace_results, trace_assigned_locals \
+        = assign.assign_variables(buffer_parcels_spec, parcel_data_df, locals_d, trace_rows=None)
+    
+    tracing.trace_df(results,
                              label='buffered_parcels',
                              index_label='None',
                              slicer='NONE',

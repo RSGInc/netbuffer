@@ -1,5 +1,13 @@
 Description,Target,Expression
 #,,
-total employment 1000 m,emptot_p,"distance = 1000, type=sum, decay=exponential, name=target"
-total education employment 1000m,empedu_p,"distance = 1000, type=sum, decay=exponential, name=target"
-total food employment 1000m,empfoo_p,"distance = 1000, type=sum, decay=exponential, name=target"
+set nodes,emptot_p_1,"network.set(df['node_id'], variable=df['emptot_p'], name='emptot_p')"
+total employment 1000 m,emptot_p_1,"network.aggregate(distance = 1000, type='sum', decay='exponential', name='emptot_p')"
+#,,
+set nodes,empedu_p_1,"network.set(df['node_id'], variable=df['empedu_p'], name='empedu_p')"
+total edu employment 1000 m,empedu_p_1,"network.aggregate(distance = 1000, type='sum', decay='exponential', name='empedu_p')"
+#,,
+set nodes,empfoo_p_1,"network.set(df['node_id'], variable=df['empfoo_p'], name='empfoo_p')"
+total edu employment 1000 m,empfoo_p_1,"network.aggregate(distance = 1000, type='sum', decay='exponential', name='empfoo_p')"
+#,,
+set nodes,empofc_p_1,"network.set(df['node_id'], variable=df['empofc_p'], name='empofc_p')"
+total edu employment 1000 m,empofc_p_1,"network.aggregate(distance = 1000, type='sum', decay='exponential', name='empofc_p')"
