@@ -1,5 +1,8 @@
 CONSTANTS:
-  # dispersion parameters
-  maximum_distance: 3.00
+  # buffering parameters
+  max_dist: 3000
+  parcel_index: parcelid
+  max_pois: 1
+  num_categories: 5
 
   

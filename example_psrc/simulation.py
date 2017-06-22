@@ -24,7 +24,8 @@ t0 = print_elapsed_time()
 
 _MODELS = [
     'compute_accessibility',
-    'buffer_parcels'
+    'buffer_parcels',
+    'distance_to_nearest_poi'
 ]
 
 
