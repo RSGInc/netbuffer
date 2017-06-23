@@ -129,16 +129,17 @@ def buffer_variables(buffer_expressions, parcel_df_name, df_dict, locals_dict, d
     buffering results will be indexed. The index of this dataframe is specified 
     in the .yml file. The closest nodes in the pandana network must be set to each 
     dataframe in df_dict before calling this module. This is achieved using 
-    network.set or network.set_poi. The buffering operations are performed on 
+    network.get_node_ids. The buffering operations are performed on 
     each node in the network, thus allowing the results to be joined to each dataframe 
     via node_id. Only the results that share the same nodes in the parcel_df_name 
-    data frame are returned. The index of this dataframe is specified in .yml file. 
+    data frame are returned.  
 
     For example, in order to find the distance of each parcel to the nearest bus stop, 
     we need a data frame representing bus stop locations and their nearest network node. 
     Pandana then finds the distance from every node in the network to the nearest node that
     represents a bus stop. Next, only the distances for nodes that are associated with
     the parcel dataframe are kept and the results are indexed to the parcel dataframe. 
+    This gives us the distance from each parcel to the nearest bus stop.  
 
     lowercase variables starting with underscore are temp variables (e.g. _local_var)
     and not returned except in trace_restults
