@@ -25,7 +25,18 @@ t0 = print_elapsed_time()
 _MODELS = [
     'compute_accessibility',
     'buffer_parcels',
-    'distance_to_nearest_poi'
+    'school_location_simulate',
+    'workplace_location_simulate',
+    'auto_ownership_simulate',
+    'cdap_simulate',
+    'mandatory_tour_frequency',
+    'mandatory_scheduling',
+    'non_mandatory_tour_frequency',
+    'destination_choice',
+    'non_mandatory_scheduling',
+    'tour_mode_choice_simulate',
+    'create_simple_trips',
+    'trip_mode_choice_simulate'
 ]
 
 
