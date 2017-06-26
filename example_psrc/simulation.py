@@ -5,7 +5,7 @@ from activitysim.core import tracing
 import pandas as pd
 import numpy as np
 import os
-os.chdir(r"D:\Stefan\actvitysim_develop\activitysim\example_psrc")
+os.chdir(r"D:\Stefan\test\activitysim\example_psrc")
 
 from activitysim.core.tracing import print_elapsed_time
 

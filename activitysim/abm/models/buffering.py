@@ -31,14 +31,16 @@ def buffer_parcels_settings(configs_dir):
 def buffer_parcels(settings, buffer_parcels_spec, buffer_parcels_settings, parcel_data, data_dir):
 
     """
-    Performs buffering for each point in parcel file using expressions from buffer_parcels_spec
+    Performs network buffering (using Pandana libary http://udst.github.io/pandana/)
+    for each point in parcel file using expressions from buffer_parcels_spec.
 
     The actual results depend on the expressions in buffer_parcels_spec, but this is initially
     intended to replicate PSRC's Soundcast (Daysim) parcel accessibilities. 
 
-    Using a point file representing a land use boundary (parcel), quanitifes the amount or distance of
-    a varaible associated with the zone. For example, the total number of jobs within a half mile 
-    for each parcel for the distance to the nearest bus stop from each parcel.  
+    Using a point file representing the centroid of a land use boundary (parcel), quanitifes 
+    the amount or distance of a varaible associated with the zone. For example, the total number
+    of jobs within a half mile for each parcel for the distance to the nearest bus stop from each 
+    parcel.  
   
     """
 
@@ -46,7 +48,7 @@ def buffer_parcels(settings, buffer_parcels_spec, buffer_parcels_settings, parce
 
     constants = config.get_model_constants(buffer_parcels_settings)
     
-    pdna.network.reserve_num_graphs(2)
+    # see pandana documentation to download and store a pandana network specific to the study area. 
     net_fname = os.path.join(data_dir, settings["buffer_network"])
     network = pdna.Network.from_hdf5(net_fname)
     network.init_pois(num_categories=constants["num_categories"], max_dist=constants["max_dist"], max_pois=constants["max_pois"])
@@ -64,6 +66,7 @@ def buffer_parcels(settings, buffer_parcels_spec, buffer_parcels_settings, parce
     # also- might be better to store in the master h5 file.  
     poi_fname = os.path.join(data_dir, settings["transit_stops"]) 
     poi_df = pd.read_csv(poi_fname, index_col = False)
+    poi_df['node_id'] = network.get_node_ids(poi_df['x'].values, poi_df['y'].values)
  
     # intersections:
     # combine from and to columns
@@ -81,23 +84,20 @@ def buffer_parcels(settings, buffer_parcels_spec, buffer_parcels_settings, parce
     intersections_df['nodes4'] = np.where(intersections_df['edge_count']>3, 1, 0)
 
     locals_d = {
-        'network': network
-    }
-
-    # perhaps these could be stored in locals_d
-    df_dic = {
+        'network': network,
         'parcels_df' : parcel_data_df,
         'intersections_df' : intersections_df,
         'poi_df': poi_df
-        }
+    }
 
     
     if constants is not None:
         locals_d.update(constants)
 
     results, trace_results, trace_assigned_locals \
-        = buffer.buffer_variables(buffer_parcels_spec, 'parcels_df', df_dic, locals_d, trace_rows=None)
+        = buffer.buffer_variables(buffer_parcels_spec, 'parcels_df', locals_d, trace_rows=None)
     
+    results = results.fillna(0)
 
     tracing.trace_df(results,
                              label='buffered_parcels',

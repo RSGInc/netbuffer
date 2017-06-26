@@ -115,31 +115,34 @@ class NumpyLogger(object):
         self.logger.error("expression: %s = %s" % (str(self.target), str(self.expression)))
 
 
-def buffer_variables(buffer_expressions, parcel_df_name, df_dict, locals_dict, df_alias=None, trace_rows=None):
+def buffer_variables(buffer_expressions, parcel_df_name, locals_dict, df_alias=None, trace_rows=None):
     """
-    Perform network buffering on point based data (e.g. parcel centroids) using a 
-    set of variable expressions from a spec in the context of a given data table.
+    Perform network accessibility calculations (using Pandana libary 
+    http://udst.github.io/pandana/) on point based data (e.g. parcel 
+    centroids) using a set of expressions from a spec in the context of 
+    a given data table.
 
     Expressions are evaluated using Python's eval function.
-    Python expressions have access to variables in locals_d and df_dict.
+    Python expressions have access to variables in locals_d.
     They also have access to previously assigned
     targets as the assigned target name.
 
-    parcel_df_name is the name of the data frame in df_dict to which all 
-    buffering results will be indexed. The index of this dataframe is specified 
-    in the .yml file. The closest nodes in the pandana network must be set to each 
-    dataframe in df_dict before calling this module. This is achieved using 
-    network.get_node_ids. The buffering operations are performed on 
-    each node in the network, thus allowing the results to be joined to each dataframe 
-    via node_id. Only the results that share the same nodes in the parcel_df_name 
-    data frame are returned.  
+    parcel_df_name is the name of the data frame in locals_dict to which 
+    all buffering results will be indexed. This colum (name) is specified 
+    in the .yml file. The closest nodes in the pandana network must be set 
+    to each dataframe that will be used in for network querying (stored in locas_d)  
+    before calling this module. This is achieved using network.get_node_ids. 
+    The buffering operations are performed on each node in the network, thus 
+    allowing the results to be joined to each dataframe via node_id. Only 
+    the results that share the same nodes in the parcel_df_name data frame 
+    are returned. 
 
-    For example, in order to find the distance of each parcel to the nearest bus stop, 
-    we need a data frame representing bus stop locations and their nearest network node. 
-    Pandana then finds the distance from every node in the network to the nearest node that
-    represents a bus stop. Next, only the distances for nodes that are associated with
-    the parcel dataframe are kept and the results are indexed to the parcel dataframe. 
-    This gives us the distance from each parcel to the nearest bus stop.  
+    For example, in order to find the distance of each parcel to the nearest 
+    bus stop, we need a data frame representing bus stop locations and their 
+    nearest network node. Pandana then finds the distance from every node in 
+    the network to the nearest node that represents a bus stop. Next, only 
+    the distances for nodes that are associated with the parcel dataframe are 
+    kept and the results are indexed to the parcel dataframe. 
 
     lowercase variables starting with underscore are temp variables (e.g. _local_var)
     and not returned except in trace_restults
@@ -204,11 +207,11 @@ def buffer_variables(buffer_expressions, parcel_df_name, df_dict, locals_dict, d
 
     # avoid touching caller's passed-in locals_d parameter (they may be looping)
     locals_dict = locals_dict.copy() if locals_dict is not None else {}
-    df = df_dict[parcel_df_name]
-    if df_alias:
-        locals_dict[df_alias] = df
-    else:
-        locals_dict['df'] = df
+    #df = df_dict[parcel_df_name]
+    #if df_alias:
+    #    locals_dict[df_alias] = df
+    #else:
+    #    locals_dict['df'] = df
     local_keys = locals_dict.keys()
 
     
@@ -241,26 +244,26 @@ def buffer_variables(buffer_expressions, parcel_df_name, df_dict, locals_dict, d
             network = locals_dict['network']
             # aggregate query
             if 'aggregate' in expression:
-                network.set(df_dict[target_df]['node_id'], variable=df_dict[target_df][var], name=var)
+                network.set(locals_dict[target_df]['node_id'], variable=locals_dict[target_df][var], name=var)
                 values = to_series(eval(expression, globals(), locals_dict), target=target)
                 # index results to the parcel_df:
-                df_dict[parcel_df_name][target] = values.loc[df_dict[parcel_df_name].node_id].values 
-                values = df_dict[parcel_df_name][target] 
+                locals_dict[parcel_df_name][target] = values.loc[locals_dict[parcel_df_name].node_id].values 
+                values = locals_dict[parcel_df_name][target] 
             
                 # nearest poi
             elif 'nearest_pois' in expression:
-                temp_df = df_dict['poi_df'][(df_dict['poi_df'][var] == 1)]
+                temp_df = locals_dict[target_df][(locals_dict[target_df][var] == 1)]
                 network.set_pois(var, temp_df['x'], temp_df['y'])
                 values = to_series(eval(expression, globals(), locals_dict), target=target)
                 # index results to the parcel_df:
-                df_dict[parcel_df_name][target] = values.loc[df_dict[parcel_df_name].node_id].values
-                values = df_dict[parcel_df_name][target] 
+                locals_dict[parcel_df_name][target] = values.loc[locals_dict[parcel_df_name].node_id].values
+                values = locals_dict[parcel_df_name][target] 
             
             # panda df assignment:
             else:
                 values = to_series(eval(expression, globals(), locals_dict), target=target)
-                # the parcel_df might need this column for a subsequent buffer operation
-                df_dict[parcel_df_name] = df_dict[parcel_df_name].merge(pd.DataFrame(values, columns=[target]), how = 'left', left_index = True, right_index = True)
+                # the target_df might need this column for a subsequent buffer operation
+                locals_dict[target_df] = locals_dict[target_df].merge(pd.DataFrame(values, columns=[target]), how = 'left', left_index = True, right_index = True)
             np.seterr(**save_err)
             np.seterrcall(saved_handler)
 
