@@ -263,6 +263,9 @@ def buffer_variables(buffer_expressions, parcel_df_name, locals_dict, df_alias=N
             else:
                 values = to_series(eval(expression, globals(), locals_dict), target=target)
                 # the target_df might need this column for a subsequent buffer operation
+                # delete if exists:
+                if target in locals_dict[target_df].columns:
+                    locals_dict[target_df].drop(target, 1, inplace = True)
                 locals_dict[target_df] = locals_dict[target_df].merge(pd.DataFrame(values, columns=[target]), how = 'left', left_index = True, right_index = True)
             np.seterr(**save_err)
             np.seterrcall(saved_handler)

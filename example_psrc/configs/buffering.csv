@@ -1,28 +1,29 @@
-Description,Target,Variable,TargetDF,Expression,,,,,,,,,,,,,
-number 1 segment intersections (dead ends) QMI,nodes1_1,nodes1,intersections_df,"network.aggregate(distance = 402.336, type='sum', decay='exponential', name='nodes1')",,,,,,,,,,,,,
-number of 3 segment intersections QMI,nodes3_1,nodes3,intersections_df,"network.aggregate(distance = 402.336, type='sum', decay='exponential', name='nodes3')",,,,,,,,,,,,,
-number of 4+ segment intersections QMI ,nodes4_1,nodes4,intersections_df,"network.aggregate(distance = 402.336, type='sum', decay='exponential', name='nodes4')",,,,,,,,,,,,,
-#,,,,,,,,,,,,,,,,,
-field to calc daily weighted parking,_daily_weighted_spaces,None,parcels_df,parcels_df['parkdy_p']*parcels_df['ppricdyp'],,,,,,,,,,,,,
-hourly weighted spaces,_hourly_weighted_spaces,None,parcels_df,parcels_df['parkhr_p']*parcels_df['pprichrp'],,,,,,,,,,,,,
-total daily weighted QMI,_daily_weighted_spaces_1,_daily_weighted_spaces,parcels_df,"network.aggregate(distance = 402.336, type='sum', decay='exponential', name='_daily_weighted_spaces')",,,,,,,,,,,,,
-hourly daily weighted QMI,_hourly_weighted_spaces_1,_hourly_weighted_spaces,parcels_df,"network.aggregate(distance = 402.336, type='sum', decay='exponential', name='_hourly_weighted_spaces')",,,,,,,,,,,,,
-parking daily QMI,parkdy_p_1,parkdy_p,parcels_df,"network.aggregate(distance = 402.336, type='sum', decay='exponential', name='parkdy_p')",,,,,,,,,,,,,
-parking hourly QMI,parkhr_p_1,parkhr_p,parcels_df,"network.aggregate(distance = 402.336, type='sum', decay='exponential', name='parkhr_p')",,,,,,,,,,,,,
-daily weighted parking prices by spaces QMI,ppricdyp_1,None,parcels_df,_daily_weighted_spaces_1/parkdy_p_1,,,,,,,,,,,,,
-hourly weighted parking prices by spaces QMI,pprichrp_1,None,parcels_df,_hourly_weighted_spaces_1/parkhr_p_1,,,,,,,,,,,,,
-#,,,,,,,,,,,,,,,,,
-distance to nearest bus (5000 meters max),dist_bus_1,bus,poi_df,"network.nearest_pois(5000, 'bus', num_pois=1, max_distance=99999)",,,,,,,,,,,,,
-distance to nearest light_rail (5000 meters max),dist_lr_1,light_rail,poi_df,"network.nearest_pois(5000, 'light_rail', num_pois=1, max_distance=99999)",,,,,,,,,,,,,parcels['daily_weighted_spaces'] = parcels['PARKDY_P']*parcels['PPRICDYP']
-#,,,,,,,,,,,,,,,,,    parcels['hourly_weighted_spaces'] = parcels['PARKHR_P']*parcels['PPRICHRP']
-# ,,,,,,,,,,,,,,,,,
-all transit stops,_tstops,None,poi_df,poi_df['bus'] + poi_df['light_rail'] + poi_df['ferry']+ poi_df['commuter_rail'] + poi_df['brt'] + poi_df['express'],,,,,,,,,,,,,
-number of transit stops QMI,tstops_1,_tstops,poi_df,"network.aggregate(distance = 402.336, type='sum', decay='exponential', name='_tstops')",,,,,,,,,,,,,
-#,,,,,,,,,,,,,,,,,
-total employment QMI,emptot_p_1,emptot_p,parcels_df,"network.aggregate(distance = 402.336, type='sum', decay='exponential', name='emptot_p')",,,,,,,,,,,,,
-#,,,,,,,,,,,,,,,,,
-total edu employment QMI,empedu_p_1,empedu_p,parcels_df,"network.aggregate(distance = 402.336, type='sum', decay='exponential', name='empedu_p')",,,,,,,,,,,,,
-#,,,,,,,,,,,,,,,,,
-total edu employment QMI,empfoo_p_1,empfoo_p,parcels_df,"network.aggregate(distance = 402.336, type='sum', decay='exponential', name='empfoo_p')",,,,,,,,,,,,,
-#,,,,,,,,,,,,,,,,,
-total edu employment QMI,empofc_p_1,empofc_p,parcels_df,"network.aggregate(distance = 402.336, type='sum', decay='exponential', name='empofc_p')",,,,,,,,,,,,,
+Description,Target,Variable,TargetDF,Expression
+test,nodes1_1,nodes1,intersections_df,"network.aggregate(distance = 1000, type='sum', decay='exponential', name='nodes1')"
+test,nodes3_1,nodes3,intersections_df,"network.aggregate(distance = 1000, type='sum', decay='exponential', name='nodes3')"
+test,nodes4_1,nodes4,intersections_df,"network.aggregate(distance = 1000, type='sum', decay='exponential', name='nodes4')"
+#,,,,
+field to calc daily weighted parking,_daily_weighted_spaces,None,parcels_df,parcels_df['parkdy_p']*parcels_df['ppricdyp']
+hourly weighted spaces,_hourly_weighted_spaces,None,parcels_df,parcels_df['parkhr_p']*parcels_df['pprichrp']
+total daily weighted 1000m,_daily_weighted_spaces_1,_daily_weighted_spaces,parcels_df,"network.aggregate(distance = 1000, type='sum', decay='exponential', name='_daily_weighted_spaces')"
+hourly daily weighted 1000m,_hourly_weighted_spaces_1,_hourly_weighted_spaces,parcels_df,"network.aggregate(distance = 1000, type='sum', decay='exponential', name='_hourly_weighted_spaces')"
+parking daily 1000m,parkdy_p_1,parkdy_p,parcels_df,"network.aggregate(distance = 1000, type='sum', decay='exponential', name='parkdy_p')"
+parking hourly 1000m,parkhr_p_1,parkhr_p,parcels_df,"network.aggregate(distance = 1000, type='sum', decay='exponential', name='parkhr_p')"
+daily weighted parking prices by spaces 1000m,ppricdyp_1,None,parcels_df,_daily_weighted_spaces_1/parkdy_p_1
+hourly weighted parking prices by spaces 1000m,pprichrp_1,None,parcels_df,_hourly_weighted_spaces_1/parkhr_p_1
+#,,,,
+distance to nearest bus,dist_bus_1,bus,poi_df,"network.nearest_pois(2000, 'bus', num_pois=1, max_distance=99999)"
+distance to nearest light_rail,dist_lr_1,light_rail,poi_df,"network.nearest_pois(2000, 'light_rail', num_pois=1, max_distance=99999)"
+#,,,,
+# Below will run aggregate query on every point in poi_df. No support yet to query out positive values only. Ok for now since each point is a transit stop. Should fix though. ,,,,
+test,_tstops,None,poi_df,poi_df['bus'] + poi_df['light_rail'] + poi_df['ferry']
+test,_tstops,None,poi_df,"np.where(poi_df['_tstops']>1, 1, 0)"
+number of transit stops 1000m,tstops_1,_tstops,poi_df,"network.aggregate(distance = 1000, type='sum', decay='exponential', name='_tstops')"
+#,,,,
+total employment 1000 m,emptot_p_1,emptot_p,parcels_df,"network.aggregate(distance = 1000, type='sum', decay='exponential', name='emptot_p')"
+#,,,,
+total edu employment 1000 m,empedu_p_1,empedu_p,parcels_df,"network.aggregate(distance = 1000, type='sum', decay='exponential', name='empedu_p')"
+#,,,,
+total edu employment 1000 m,empfoo_p_1,empfoo_p,parcels_df,"network.aggregate(distance = 1000, type='sum', decay='exponential', name='empfoo_p')"
+#,,,,
+total edu employment 1000 m,empofc_p_1,empofc_p,parcels_df,"network.aggregate(distance = 1000, type='sum', decay='exponential', name='empofc_p')"
