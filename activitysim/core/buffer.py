@@ -44,12 +44,13 @@ def undupe_column_names(df, template="{} ({})"):
 
 
 def read_buffer_spec(fname,
-                         description_name="Description",
-                         target_name="Target",
-                         variable_name = "Variable",
-                         target_df_name = "TargetDF",
-                         expression_name="Expression"
-                         ):
+                     description_name="Description",
+                     target_name="Target",
+                     variable_name="Variable",
+                     target_df_name="TargetDF",
+                     expression_name="Expression"
+                     ):
+
     """
     Read a CSV model specification into a Pandas DataFrame or Series.
 
@@ -74,7 +75,7 @@ def read_buffer_spec(fname,
         Name of the column in `fname` that contains the target dataframe.
     expression_name : str, optional
         Name of the column in `fname` that contains the component expression.
-    
+
 
     Returns
     -------
@@ -115,11 +116,13 @@ class NumpyLogger(object):
         self.logger.error("expression: %s = %s" % (str(self.target), str(self.expression)))
 
 
-def buffer_variables(buffer_expressions, parcel_df_name, locals_dict, df_alias=None, trace_rows=None):
+def buffer_variables(buffer_expressions,
+                     parcel_df_name, locals_dict,
+                     df_alias=None, trace_rows=None):
     """
-    Perform network accessibility calculations (using Pandana libary 
-    http://udst.github.io/pandana/) on point based data (e.g. parcel 
-    centroids) using a set of expressions from a spec in the context of 
+    Perform network accessibility calculations (using Pandana libary
+    http://udst.github.io/pandana/) on point based data (e.g. parcel
+    centroids) using a set of expressions from a spec in the context of
     a given data table.
 
     Expressions are evaluated using Python's eval function.
@@ -127,22 +130,22 @@ def buffer_variables(buffer_expressions, parcel_df_name, locals_dict, df_alias=N
     They also have access to previously assigned
     targets as the assigned target name.
 
-    parcel_df_name is the name of the data frame in locals_dict to which 
-    all buffering results will be indexed. This colum (name) is specified 
-    in the .yml file. The closest nodes in the pandana network must be set 
-    to each dataframe that will be used in for network querying (stored in locas_d)  
-    before calling this module. This is achieved using network.get_node_ids. 
-    The buffering operations are performed on each node in the network, thus 
-    allowing the results to be joined to each dataframe via node_id. Only 
-    the results that share the same nodes in the parcel_df_name data frame 
-    are returned. 
+    parcel_df_name is the name of the data frame in locals_dict to which
+    all buffering results will be indexed. This colum (name) is specified
+    in the .yml file. The closest nodes in the pandana network must be set
+    to each dataframe that will be used in for network querying (stored in locas_d)
+    before calling this module. This is achieved using network.get_node_ids.
+    The buffering operations are performed on each node in the network, thus
+    allowing the results to be joined to each dataframe via node_id. Only
+    the results that share the same nodes in the parcel_df_name data frame
+    are returned.
 
-    For example, in order to find the distance of each parcel to the nearest 
-    bus stop, we need a data frame representing bus stop locations and their 
-    nearest network node. Pandana then finds the distance from every node in 
-    the network to the nearest node that represents a bus stop. Next, only 
-    the distances for nodes that are associated with the parcel dataframe are 
-    kept and the results are indexed to the parcel dataframe. 
+    For example, in order to find the distance of each parcel to the nearest
+    bus stop, we need a data frame representing bus stop locations and their
+    nearest network node. Pandana then finds the distance from every node in
+    the network to the nearest node that represents a bus stop. Next, only
+    the distances for nodes that are associated with the parcel dataframe are
+    kept and the results are indexed to the parcel dataframe.
 
     lowercase variables starting with underscore are temp variables (e.g. _local_var)
     and not returned except in trace_restults
@@ -159,15 +162,15 @@ def buffer_variables(buffer_expressions, parcel_df_name, locals_dict, df_alias=N
     buffer_expressions : pandas.DataFrame of target assignment expressions
         target: target column names
         variable: target variable to be buffered
-        target_df: datafram that contains the variable to be buffered. 
+        target_df: datafram that contains the variable to be buffered.
         expression: pandana, pandas or python expression to evaluate
-    parcel_df_name: the name of the df in df_dict to which all results 
-        will be indexed. 
+    parcel_df_name: the name of the df in df_dict to which all results
+        will be indexed.
     df_dict : dictionary of pandas.DataFrames. This must include the df
         referenced by parcel_df_name. A poi_df can be used to find distances
-        to other points like bus stops. All poi's should be stored in this 
-        one df. Other dfs can be used for aggregate buffering such as 
-        intersections_df. 
+        to other points like bus stops. All poi's should be stored in this
+        one df. Other dfs can be used for aggregate buffering such as
+        intersections_df.
     locals_d : Dict
         This is a dictionary of local variables that will be the environment
         for an evaluation of "python" expression.
@@ -207,21 +210,15 @@ def buffer_variables(buffer_expressions, parcel_df_name, locals_dict, df_alias=N
 
     # avoid touching caller's passed-in locals_d parameter (they may be looping)
     locals_dict = locals_dict.copy() if locals_dict is not None else {}
-    #df = df_dict[parcel_df_name]
-    #if df_alias:
-    #    locals_dict[df_alias] = df
-    #else:
-    #    locals_dict['df'] = df
     local_keys = locals_dict.keys()
-
-    
 
     l = []
     # need to be able to identify which variables causes an error, which keeps
     # this from being expressed more parsimoniously
-    for e in zip(buffer_expressions.target, buffer_expressions.variable, buffer_expressions.target_df, buffer_expressions.expression):
+    for e in zip(buffer_expressions.target, buffer_expressions.variable, 
+                 buffer_expressions.target_df, buffer_expressions.expression):
         target, var, target_df, expression = e
-        
+
         if target in local_keys:
             logger.warn("assign_variables target obscures local_d name '%s'" % str(target))
 
@@ -244,12 +241,13 @@ def buffer_variables(buffer_expressions, parcel_df_name, locals_dict, df_alias=N
             network = locals_dict['network']
             # aggregate query
             if 'aggregate' in expression:
-                network.set(locals_dict[target_df]['node_id'], variable=locals_dict[target_df][var], name=var)
+                network.set(locals_dict[target_df]['node_id'], 
+                            variable=locals_dict[target_df][var], name=var)
                 values = to_series(eval(expression, globals(), locals_dict), target=target)
                 # index results to the parcel_df:
-                locals_dict[parcel_df_name][target] = values.loc[locals_dict[parcel_df_name].node_id].values 
-                values = locals_dict[parcel_df_name][target] 
-            
+                locals_dict[parcel_df_name][target] = values.loc[locals_dict[parcel_df_name].node_id].values
+                values = locals_dict[parcel_df_name][target]
+
                 # nearest poi
             elif 'nearest_pois' in expression:
                 temp_df = locals_dict[target_df][(locals_dict[target_df][var] == 1)]
@@ -257,16 +255,17 @@ def buffer_variables(buffer_expressions, parcel_df_name, locals_dict, df_alias=N
                 values = to_series(eval(expression, globals(), locals_dict), target=target)
                 # index results to the parcel_df:
                 locals_dict[parcel_df_name][target] = values.loc[locals_dict[parcel_df_name].node_id].values
-                values = locals_dict[parcel_df_name][target] 
-            
+                values = locals_dict[parcel_df_name][target]
+
             # panda df assignment:
             else:
                 values = to_series(eval(expression, globals(), locals_dict), target=target)
                 # the target_df might need this column for a subsequent buffer operation
                 # delete if exists:
                 if target in locals_dict[target_df].columns:
-                    locals_dict[target_df].drop(target, 1, inplace = True)
-                locals_dict[target_df] = locals_dict[target_df].merge(pd.DataFrame(values, columns=[target]), how = 'left', left_index = True, right_index = True)
+                    locals_dict[target_df].drop(target, 1, inplace=True)
+                locals_dict[target_df] = locals_dict[target_df].merge(pd.DataFrame(
+                    values, columns=[target]), how='left', left_index=True, right_index=True)
             np.seterr(**save_err)
             np.seterrcall(saved_handler)
 

@@ -1,6 +1,6 @@
 CONSTANTS:
   # buffering parameters
-  max_dist: 3000
+  max_dist: 16000
   parcel_index: parcelid
   max_pois: 1
   num_categories: 5
