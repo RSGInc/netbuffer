@@ -56,6 +56,8 @@ def buffer_parcels(settings, buffer_parcels_spec,
     # see pandana documentation to download and store a pandana network specific to the study area.
     network_fname = os.path.join(data_dir, settings["buffer_network"])
     network = pdna.Network.from_hdf5(network_fname)
+    network.init_pois(num_categories=constants["num_categories"], 
+                      max_dist=constants["max_dist"], max_pois=constants["max_pois"])
 
     parcel_data_df = parcel_data.to_frame()
     parcel_data_df.reset_index(level=0, inplace=True)

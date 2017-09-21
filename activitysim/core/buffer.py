@@ -133,7 +133,7 @@ def buffer_variables(buffer_expressions,
     parcel_df_name is the name of the data frame in locals_dict to which
     all buffering results will be indexed. This colum (name) is specified
     in the .yml file. The closest nodes in the pandana network must be set
-    to each dataframe that will be used in for network querying (stored in locas_d)
+    to each dataframe that will be used in for network querying (stored in locals_d)
     before calling this module. This is achieved using network.get_node_ids.
     The buffering operations are performed on each node in the network, thus
     allowing the results to be joined to each dataframe via node_id. Only
@@ -196,7 +196,7 @@ def buffer_variables(buffer_expressions,
     def to_series(x, target=None):
         if x is None or np.isscalar(x):
             if target:
-                logger.warn("WARNING: assign_variables promoting scalar %s to series" % target)
+                logger.warn("WARNING: buffer_variables promoting scalar %s to series" % target)
             return pd.Series([x] * len(df.index), index=df.index)
         return x
 
@@ -220,7 +220,7 @@ def buffer_variables(buffer_expressions,
         target, var, target_df, expression = e
 
         if target in local_keys:
-            logger.warn("assign_variables target obscures local_d name '%s'" % str(target))
+            logger.warn("buffer_variables target obscures local_d name '%s'" % str(target))
 
         if is_local(target):
 
@@ -239,6 +239,7 @@ def buffer_variables(buffer_expressions,
             save_err = np.seterr(all='log')
 
             network = locals_dict['network']
+            
             # aggregate query
             if 'aggregate' in expression:
                 network.set(locals_dict[target_df]['node_id'], 
@@ -248,7 +249,7 @@ def buffer_variables(buffer_expressions,
                 locals_dict[parcel_df_name][target] = values.loc[locals_dict[parcel_df_name].node_id].values
                 values = locals_dict[parcel_df_name][target]
 
-                # nearest poi
+            # nearest poi
             elif 'nearest_pois' in expression:
                 temp_df = locals_dict[target_df][(locals_dict[target_df][var] == 1)]
                 network.set_pois(var, temp_df['x'], temp_df['y'])
