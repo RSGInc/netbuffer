@@ -107,6 +107,16 @@ def trace_od(settings):
 
     return od
 
+@orca.injectable(cache=True)
+def trace_parcels(settings):
+
+    parcels = settings.get('trace_parcels', None)
+
+    if parcels and not (isinstance(parcels, list) and all(isinstance(x, int) for x in parcels)):
+        logger.warn("setting trace_parcels is wrong type, should be a list of type integer, but was %s" % parcels)
+        parcels = None
+
+    return parcels
 
 @orca.injectable(cache=True)
 def enable_trace_log(trace_hh_id, trace_od):

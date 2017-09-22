@@ -171,7 +171,7 @@ def buffer_variables(buffer_expressions,
         to other points like bus stops. All poi's should be stored in this
         one df. Other dfs can be used for aggregate buffering such as
         intersections_df.
-    locals_d : Dict
+    locals_dict : Dict
         This is a dictionary of local variables that will be the environment
         for an evaluation of "python" expression.
     trace_rows: series or array of bools to use as mask to select target rows to trace
@@ -282,7 +282,11 @@ def buffer_variables(buffer_expressions,
         l.append((target, values))
 
         if trace_results is not None:
-            trace_results.append((target, values[trace_rows]))
+            # some calcs are not included in the final df so may not have the
+            # parcels that being traced. These should have a value of 'None' in
+            # spec under the 'variable' column. 
+            if var <> 'None': 
+                trace_results.append((target, values[trace_rows]))
 
         # update locals to allows us to ref previously assigned targets
         locals_dict[target] = values
@@ -306,11 +310,11 @@ def buffer_variables(buffer_expressions,
     if trace_results is not None:
 
         trace_results = pd.DataFrame.from_items(trace_results)
-        trace_results.index = df[trace_rows].index
+        trace_results.index = locals_dict[parcel_df_name][trace_rows].index
 
-        trace_results = undupe_column_names(trace_results)
+        #trace_results = undupe_column_names(trace_results)
 
         # add df columns to trace_results
-        trace_results = pd.concat([df[trace_rows], trace_results], axis=1)
+        #trace_results = pd.concat([locals_dict[parcel_df_name], trace_results], axis=1)
 
     return variables, trace_results, trace_assigned_locals

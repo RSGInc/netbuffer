@@ -12,6 +12,9 @@ trace_hh_id: 961042
 # trace origin, destination in accessibility calculation
 trace_od: [5, 11]
 
+# trace parcel in buffering
+trace_parcels: [1117718, 910777]
+
 #internal settings 
 chunk_size: 10000
 # chunk size for models that must process all data for a household in he same chunk (e.g. cdap)
