@@ -13,7 +13,7 @@ trace_hh_id: 961042
 trace_od: [5, 11]
 
 # trace parcel in buffering
-trace_parcels: [1117718, 910777]
+trace_parcels: [1117718, 910777, 673572]
 
 #internal settings 
 chunk_size: 10000

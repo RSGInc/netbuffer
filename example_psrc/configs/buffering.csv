@@ -17,7 +17,7 @@ distance to nearest bus in feet,dist_bus,bus,parcels_df,"np.where(parcels_df['di
 distance to nearest light_rail,dist_lrt,light_rail,poi_df,"network.nearest_pois(15840, 'light_rail', num_pois=1, max_distance=99999)"
 distance to nearest light rail in feet,dist_lrt,light_rail,parcels_df,"np.where(parcels_df['dist_lrt']<99999, parcels_df['dist_lrt'] /5280.0, 99999)"
 #,,,,
-# Below will run aggregate query on every point in poi_df. No support yet to query out positive values only. Ok for now since each point is a transit stop. Should fix though. ,,,,
+# Calc a new column in the poi_df. This could also be done when making the poi table.  Values for _tstops because they are not associated with parcels. ,,,,
 test,_tstops,None,poi_df,poi_df['bus'] + poi_df['light_rail'] + poi_df['ferry']
 test,_tstops,None,poi_df,"np.where(poi_df['_tstops']>1, 1, 0)"
 number of transit stops 2640m,tstops_1,_tstops,poi_df,"network.aggregate(distance = 2640, type='sum', decay='exponential', name='_tstops')"

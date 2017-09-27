@@ -42,9 +42,8 @@ def buffer_parcels(settings, buffer_parcels_spec,
 
     Using a point file representing the centroid of a land use boundary (parcel), quanitifes
     the amount of some variable within a specified distance or the distance to a variable. For
-    example, the total number of jobs within a half mile for each parcel for the distance to the
-    nearest bus stop from each
-    parcel.
+    example, the total number of jobs within a half mile of each parcel or the distance to the
+    nearest bus stop from each parcel.
 
     """
 
@@ -113,8 +112,7 @@ def buffer_parcels(settings, buffer_parcels_spec,
 
     results = results.fillna(0)
 
-    # since parcels_data_df is local in buffer.py, it can come back with unwanted columns:
-    
+    # since parcels_data_df is local in buffer.py, it can come back with extra columns:
     del_cols = list(set(parcel_data_df.columns) - set(parcel_data.to_frame().columns))
     parcel_data_df = parcel_data_df.drop(del_cols, axis=1)
 

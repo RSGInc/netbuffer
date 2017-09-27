@@ -59,7 +59,7 @@ def read_buffer_spec(fname,
 
     The CSV is required to have a header with column names. For example:
 
-        Description,Target,Expression
+        Description,Target,Variable, TargetDF, Expression
 
     Parameters
     ----------
@@ -130,13 +130,12 @@ def buffer_variables(buffer_expressions,
     They also have access to previously assigned
     targets as the assigned target name.
 
-    parcel_df_name is the name of the data frame in locals_dict to which
-    all buffering results will be indexed. This colum (name) is specified
-    in the .yml file. The closest nodes in the pandana network must be set
-    to each dataframe that will be used in for network querying (stored in locals_d)
-    before calling this module. This is achieved using network.get_node_ids.
-    The buffering operations are performed on each node in the network, thus
-    allowing the results to be joined to each dataframe via node_id. Only
+    parcel_df_name is the name of the data frame in locals_dict, which represents
+    point data, to which all buffering and network distance measurements are 
+    applied. In order to do this, each row (point) in parcel_df must be associated with it's 
+    nearest node in the Pandana network. This is achieved using the Pandana method 
+    network.get_node_ids. The buffering operations are performed on each node in the 
+    network, thus allowing the results to be joined to the parcel df via node_id. Only
     the results that share the same nodes in the parcel_df_name data frame
     are returned.
 
@@ -196,8 +195,12 @@ def buffer_variables(buffer_expressions,
     def to_series(x, target=None):
         if x is None or np.isscalar(x):
             if target:
-                logger.warn("WARNING: buffer_variables promoting scalar %s to series" % target)
-            return pd.Series([x] * len(df.index), index=df.index)
+                logger.warn("WARNING: assign_variables promoting scalar %s to series" % target)
+            x = pd.Series([x] * len(locals_dict[parcel_df_name].index), index=locals_dict[parcel_df_name].index)
+        if not isinstance(x, pd.Series):
+            x = pd.Series(x)
+        x.name = target 
+
         return x
 
     trace_assigned_locals = trace_results = None
@@ -251,9 +254,13 @@ def buffer_variables(buffer_expressions,
 
             # nearest poi
             elif 'nearest_pois' in expression:
+                # records we want to run nearest poi on should have a value of 1. Ex- Could have a table of transit stops, 
+                # where each column is a type of transit stop, e.g. light rail, and a value of 1 in the light rail column
+                # means that that stop is a light rail stop. 
                 temp_df = locals_dict[target_df][(locals_dict[target_df][var] == 1)]
                 network.set_pois(var, temp_df['x'], temp_df['y'])
-                values = to_series(eval(expression, globals(), locals_dict), target=target)
+                # poi queries return a df, no need to put through to_series function. 
+                values = eval(expression, globals(), locals_dict)
                 # index results to the parcel_df:
                 locals_dict[parcel_df_name][target] = values.loc[locals_dict[parcel_df_name].node_id].values
                 values = locals_dict[parcel_df_name][target]
@@ -266,7 +273,7 @@ def buffer_variables(buffer_expressions,
                 if target in locals_dict[target_df].columns:
                     locals_dict[target_df].drop(target, 1, inplace=True)
                 locals_dict[target_df] = locals_dict[target_df].merge(pd.DataFrame(
-                    values, columns=[target]), how='left', left_index=True, right_index=True)
+                    values), how='left', left_index=True, right_index=True)
             np.seterr(**save_err)
             np.seterrcall(saved_handler)
 
@@ -312,7 +319,7 @@ def buffer_variables(buffer_expressions,
         trace_results = pd.DataFrame.from_items(trace_results)
         trace_results.index = locals_dict[parcel_df_name][trace_rows].index
 
-        #trace_results = undupe_column_names(trace_results)
+        trace_results = undupe_column_names(trace_results)
 
         # add df columns to trace_results
         #trace_results = pd.concat([locals_dict[parcel_df_name], trace_results], axis=1)

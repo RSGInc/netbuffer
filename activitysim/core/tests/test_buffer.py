@@ -58,7 +58,7 @@ def test_read_model_spec(spec_name):
     assert list(spec.columns) == ['description', 'target', 'variable', 'target_df', 'expression']
 
 
-def test_assign_variables(capsys, spec_name, net_name, parcel_name):
+def test_buffer_variables(capsys, spec_name, net_name, parcel_name):
 
     spec = buffer.read_buffer_spec(spec_name)
   
@@ -68,14 +68,15 @@ def test_assign_variables(capsys, spec_name, net_name, parcel_name):
                       #max_dist=constants["max_dist"], max_pois=constants["max_pois"])
 
     parcel_data_df = pd.read_csv(parcel_name)
-    assert len(parcel_data_df) == 2496
+    assert len(parcel_data_df) == 3
 
     # 
     parcel_data_df['node_id'] = network.get_node_ids(parcel_data_df['xcoord_p'].values,
                                                      parcel_data_df['ycoord_p'].values)
 
     # parcel 1219983 should be assigned to network node 82030 becuase it is the nearest node:
-    assert int(parcel_data_df[parcel_data_df['parcelid']==1219983].node_id) == 82030
+    assert int(parcel_data_df[parcel_data_df['parcelid']==735313].node_id) == 84076
+    print parcel_data_df[parcel_data_df['parcelid']==735313].node_id
 
     locals_d = {
         'network': network,
@@ -86,32 +87,32 @@ def test_assign_variables(capsys, spec_name, net_name, parcel_name):
 
 #    locals_d = {'CONSTANT': 7, '_shadow': 99}
 
-#    results, trace_results, trace_assigned_locals \
-#        = assign.assign_variables(spec, data, locals_d, trace_rows=None)
+    results, trace_results, trace_assigned_locals \
+        = buffer.buffer_variables(spec, 'parcels_df', locals_d, trace_rows=None)
 
-#    print results
+    print results.columns
 
-#    assert list(results.columns) == ['target1', 'target2', 'target3']
-#    assert list(results.target1) == [True, False, False]
-#    assert list(results.target2) == [53, 53, 55]
-#    assert list(results.target3) == [530, 530, 550]
-#    assert trace_results is None
-#    assert trace_assigned_locals is None
+    assert list(results.columns) == ['target1', 'target2', 'target3']
+    assert list(results.target1) == [382, 382, 382]
+    assert list(results.target2) == [1, 1, 1]
+    assert list(results.target3) == [383, 383, 383]
+    assert trace_results is None
+    assert trace_assigned_locals is None
 
-#    trace_rows = [False, True, False]
+    trace_parcel_rows = parcel_data_df.parcelid.isin([735313])
 
-#    results, trace_results, trace_assigned_locals \
-#        = assign.assign_variables(spec, data, locals_d, trace_rows=trace_rows)
+    results, trace_results, trace_assigned_locals \
+        = buffer.buffer_variables(spec, 'parcels_df', locals_d, trace_rows=trace_parcel_rows)
 
 #    # should get same results as before
-#    assert list(results.target3) == [530, 530, 550]
+    assert list(results.target3) == [383,383, 383]
 
 #    # should assign trace_results for second row in data
-#    print trace_results
+    print trace_results
 
-#    assert trace_results is not None
-#    assert '_scalar' in trace_results.columns
-#    assert list(trace_results['_scalar']) == [42]
+    #assert trace_results is not None
+    #assert '_temp' in trace_results.columns
+    #assert list(trace_results['_scalar']) == [42]
 
 #    # shadow should have been assigned
 #    assert list(trace_results['_shadow']) == [1]
@@ -124,7 +125,7 @@ def test_assign_variables(capsys, spec_name, net_name, parcel_name):
 #    # shouldn't have been changed even though it was a target
 #    assert locals_d['_shadow'] == 99
 
-#    out, err = capsys.readouterr()
+    out, err = capsys.readouterr()
 
 
 #def test_assign_variables_aliased(capsys, data):
