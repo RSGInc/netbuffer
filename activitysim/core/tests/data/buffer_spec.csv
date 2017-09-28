@@ -1,4 +1,5 @@
 Description,Target,Variable,TargetDF,Expression
+a scalar variable,_scalar,None,parcels_df,45
 "a temp variable, available but not returned",_temp,None,parcels_df,parcels_df['emptot_p'] 
 #,,,,
 aggregaton query1,target1,_temp,parcels_df,"network.aggregate(distance = 2640, type='sum', decay='exponential', name='_temp')"

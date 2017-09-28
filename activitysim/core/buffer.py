@@ -216,6 +216,7 @@ def buffer_variables(buffer_expressions,
     local_keys = locals_dict.keys()
 
     l = []
+    traceable = True
     # need to be able to identify which variables causes an error, which keeps
     # this from being expressed more parsimoniously
     for e in zip(buffer_expressions.target, buffer_expressions.variable, 
@@ -251,6 +252,7 @@ def buffer_variables(buffer_expressions,
                 # index results to the parcel_df:
                 locals_dict[parcel_df_name][target] = values.loc[locals_dict[parcel_df_name].node_id].values
                 values = locals_dict[parcel_df_name][target]
+                traceable = True 
 
             # nearest poi
             elif 'nearest_pois' in expression:
@@ -264,6 +266,7 @@ def buffer_variables(buffer_expressions,
                 # index results to the parcel_df:
                 locals_dict[parcel_df_name][target] = values.loc[locals_dict[parcel_df_name].node_id].values
                 values = locals_dict[parcel_df_name][target]
+                traceable = True
 
             # panda df assignment:
             else:
@@ -274,6 +277,9 @@ def buffer_variables(buffer_expressions,
                     locals_dict[target_df].drop(target, 1, inplace=True)
                 locals_dict[target_df] = locals_dict[target_df].merge(pd.DataFrame(
                     values), how='left', left_index=True, right_index=True)
+                # if assignment is to a df that is not the parcel df, then cannot trace results
+                if target_df <> parcel_df_name:
+                    traceable = False
             np.seterr(**save_err)
             np.seterrcall(saved_handler)
 
@@ -292,7 +298,7 @@ def buffer_variables(buffer_expressions,
             # some calcs are not included in the final df so may not have the
             # parcels that being traced. These should have a value of 'None' in
             # spec under the 'variable' column. 
-            if var <> 'None': 
+            if traceable: 
                 trace_results.append((target, values[trace_rows]))
 
         # update locals to allows us to ref previously assigned targets
