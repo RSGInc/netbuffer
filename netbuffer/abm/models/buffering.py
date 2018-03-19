@@ -1,5 +1,3 @@
-# ActivitySim
-# See full license in LICENSE.txt.
 
 import logging
 import os
@@ -9,7 +7,7 @@ import pandas as pd
 import numpy as np
 import pandana as pdna
 
-from activitysim.core import buffer
+from netbuffer.core import buffer
 from activitysim.core import tracing
 from activitysim.core import config
 
