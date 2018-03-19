@@ -2,7 +2,6 @@
 import logging
 import os
 
-import orca
 import pandas as pd
 import numpy as np
 import pandana as pdna
@@ -10,23 +9,23 @@ import pandana as pdna
 from netbuffer.core import buffer
 from activitysim.core import tracing
 from activitysim.core import config
-
+from activitysim.core import inject
 
 logger = logging.getLogger(__name__)
 
 
-@orca.injectable()
+@inject.injectable()
 def buffer_parcels_spec(configs_dir):
     f = os.path.join(configs_dir, 'buffering.csv')
     return buffer.read_buffer_spec(f)
 
 
-@orca.injectable()
+@inject.injectable()
 def buffer_parcels_settings(configs_dir):
     return config.read_model_settings(configs_dir, 'buffer_parcels.yaml')
 
 
-@orca.step()
+@inject.step()
 def buffer_parcels(settings, buffer_parcels_spec,
                    buffer_parcels_settings,
                    parcel_data, data_dir, trace_parcels):
@@ -118,7 +117,7 @@ def buffer_parcels(settings, buffer_parcels_spec,
     #results.reset_index(level = 0, inplace = True)
 
     for column in results.columns:
-        orca.add_column("parcel_data", column, results[column])
+        inject.add_column("parcel_data", column, results[column])
 
     if trace_parcels:
 

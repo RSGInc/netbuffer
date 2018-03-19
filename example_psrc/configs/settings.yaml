@@ -1,7 +1,7 @@
-#input data store and skims
-store: mtc_asim.h5
+store: parcels.h5
 
-skims_file: skims.omx
+models:
+  - buffer_parcels
 
 buffer_network: pandana_network.h5
 

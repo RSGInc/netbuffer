@@ -1,13 +1,13 @@
 
 
 import logging
-import orca
+from activitysim.core import inject
 
 
 logger = logging.getLogger(__name__)
 
 
-@orca.table()
+@inject.table()
 def parcel_data(store):
 
     df = store["land_use/parcel_data"]
@@ -16,7 +16,7 @@ def parcel_data(store):
     logger.info("loaded parcels %s" % (df.shape,))
 
     # replace table function with dataframe
-    orca.add_table('parcel_data', df)
+    inject.add_table('parcel_data', df)
 
     return df
 
