@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 @inject.table()
 def parcel_data(store):
 
-    df = store["land_use/parcel_data"]
+    df = store["parcel_data"]
 
 
     logger.info("loaded parcels %s" % (df.shape,))
