@@ -24,6 +24,7 @@ setup(
     install_requires=[
         'numpy >= 1.8.0',
         'pandas >= 0.18.0',
+        'orca >= 1.1',
         'activitysim >= 0.5',
         'pandana == 0.3'
     ]
