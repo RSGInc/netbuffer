@@ -25,6 +25,6 @@ setup(
         'numpy >= 1.8.0',
         'pandas >= 0.18.0',
         'activitysim >= 0.5',
-        'pandana >= 0.4'
+        'pandana == 0.3'
     ]
 )
