@@ -12,7 +12,7 @@ import pytest
 import orca
 
 from .. import buffer
-from .. import tracing
+from activitysim.core import tracing
 
 
 @pytest.fixture(scope='module')
