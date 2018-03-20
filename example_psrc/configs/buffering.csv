@@ -1,0 +1,31 @@
+Description,Target,Variable,TargetDF,Expression
+test,nodes1_1,nodes1,intersections_df,"network.aggregate(distance = 2640, type='sum', decay='exponential', name='nodes1')"
+test,nodes3_1,nodes3,intersections_df,"network.aggregate(distance = 2640, type='sum', decay='exponential', name='nodes3')"
+test,nodes4_1,nodes4,intersections_df,"network.aggregate(distance = 2640, type='sum', decay='exponential', name='nodes4')"
+#,,,,
+field to calc daily weighted parking,_daily_weighted_spaces,None,parcels_df,parcels_df['parkdy_p']*parcels_df['ppricdyp']
+hourly weighted spaces,_hourly_weighted_spaces,None,parcels_df,parcels_df['parkhr_p']*parcels_df['pprichrp']
+total daily weighted 2640m,_daily_weighted_spaces_1,_daily_weighted_spaces,parcels_df,"network.aggregate(distance = 2640, type='sum', decay='exponential', name='_daily_weighted_spaces')"
+hourly daily weighted 2640m,_hourly_weighted_spaces_1,_hourly_weighted_spaces,parcels_df,"network.aggregate(distance = 2640, type='sum', decay='exponential', name='_hourly_weighted_spaces')"
+parking daily 2640m,parkdy_p_1,parkdy_p,parcels_df,"network.aggregate(distance = 2640, type='sum', decay='exponential', name='parkdy_p')"
+parking hourly 2640m,parkhr_p_1,parkhr_p,parcels_df,"network.aggregate(distance = 2640, type='sum', decay='exponential', name='parkhr_p')"
+daily weighted parking prices by spaces 2640m,ppricdyp_1,None,parcels_df,_daily_weighted_spaces_1/parkdy_p_1
+hourly weighted parking prices by spaces 2640m,pprichrp_1,None,parcels_df,_hourly_weighted_spaces_1/parkhr_p_1
+#,,,,
+distance to nearest bus,dist_bus,bus,poi_df,"network.nearest_pois(15840, 'bus', num_pois=1, max_distance=99999)"
+distance to nearest bus in feet,dist_bus,bus,parcels_df,"np.where(parcels_df['dist_bus']<99999, parcels_df['dist_bus'] /5280.0, 99999)"
+distance to nearest light_rail,dist_lrt,light_rail,poi_df,"network.nearest_pois(15840, 'light_rail', num_pois=1, max_distance=99999)"
+distance to nearest light rail in feet,dist_lrt,light_rail,parcels_df,"np.where(parcels_df['dist_lrt']<99999, parcels_df['dist_lrt'] /5280.0, 99999)"
+#,,,,
+# Calc a new column in the poi_df. This could also be done when making the poi table.  Values for _tstops because they are not associated with parcels. ,,,,
+test,_tstops,None,poi_df,poi_df['bus'] + poi_df['light_rail'] + poi_df['ferry']
+test,_tstops,None,poi_df,"np.where(poi_df['_tstops']>1, 1, 0)"
+number of transit stops 2640m,tstops_1,_tstops,poi_df,"network.aggregate(distance = 2640, type='sum', decay='exponential', name='_tstops')"
+#,,,,
+total employment 2640 m,emptot_p_1,emptot_p,parcels_df,"network.aggregate(distance = 2640, type='sum', decay='exponential', name='emptot_p')"
+#,,,,
+total edu employment 2640 m,empedu_p_1,empedu_p,parcels_df,"network.aggregate(distance = 2640, type='sum', decay='exponential', name='empedu_p')"
+#,,,,
+total edu employment 2640 m,empfoo_p_1,empfoo_p,parcels_df,"network.aggregate(distance = 2640, type='sum', decay='exponential', name='empfoo_p')"
+#,,,,
+total edu employment 2640 m,empofc_p_1,empofc_p,parcels_df,"network.aggregate(distance = 2640, type='sum', decay='exponential', name='empofc_p')"
