@@ -1,0 +1,12 @@
+store: parcels.h5
+
+models:
+  - buffer_parcels
+
+buffer_network: pandana_network.h5
+
+transit_stops: transit_stops.csv
+
+# trace parcel in buffering
+
+trace_parcels: [1117718, 910777, 673572]
