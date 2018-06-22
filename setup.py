@@ -8,10 +8,10 @@ with open('README.rst') as file:
 
 setup(
     name='netbuffer',
-    version='0.1',
+    version='0.2',
     description='Network based queries and aggregations on land use data',
     author='contributing authors',
-    author_email='ben.stabler@rsginc.com',
+    author_email='scoe@psrc.org',
     license='BSD-3',
     url='https://github.com/psrc/netbuffer',
     classifiers=[
@@ -25,7 +25,7 @@ setup(
         'numpy >= 1.8.0',
         'pandas >= 0.18.0',
         'orca >= 1.1',
-        'activitysim >= 0.5',
+        'activitysim >= 0.6',
         'pandana == 0.3'
     ]
 )

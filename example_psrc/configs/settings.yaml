@@ -1,12 +1,8 @@
+
 store: parcels.h5
 
 models:
+  # Cannot initialize the pandana network twice so need to run two Python sessions 
+  # AssertionError: Adding more networks than have been reserved
+  # - create_network 
   - buffer_parcels
-
-buffer_network: pandana_network.h5
-
-transit_stops: transit_stops.csv
-
-# trace parcel in buffering
-
-trace_parcels: [1117718, 910777, 673572]

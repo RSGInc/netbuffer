@@ -209,11 +209,11 @@ def buffer_variables(buffer_expressions,
         if trace_rows.any():
             trace_results = []
             trace_assigned_locals = {}
-
+    
     # avoid touching caller's passed-in locals_d parameter (they may be looping)
     locals_dict = locals_dict.copy() if locals_dict is not None else {}
     local_keys = locals_dict.keys()
-
+    
     l = []
     traceable = True
     # need to be able to identify which variables causes an error, which keeps
@@ -245,28 +245,31 @@ def buffer_variables(buffer_expressions,
             
             # aggregate query
             if 'aggregate' in expression:
-                network.set(locals_dict[target_df]['node_id'], 
+                network.set(locals_dict[target_df][locals_dict['node_id']], 
                             variable=locals_dict[target_df][var], name=var)
                 values = to_series(eval(expression, globals(), locals_dict), target=target)
                 # index results to the parcel_df:
-                locals_dict[parcel_df_name][target] = values.loc[locals_dict[parcel_df_name].node_id].values
+                locals_dict[parcel_df_name][target] = values.loc[locals_dict[parcel_df_name][locals_dict['node_id']]].values
                 values = locals_dict[parcel_df_name][target]
                 traceable = True 
-
+                
             # nearest poi
             elif 'nearest_pois' in expression:
                 # records we want to run nearest poi on should have a value of 1. Ex- Could have a table of transit stops, 
                 # where each column is a type of transit stop, e.g. light rail, and a value of 1 in the light rail column
                 # means that that stop is a light rail stop. 
                 temp_df = locals_dict[target_df][(locals_dict[target_df][var] == 1)]
-                network.set_pois(var, temp_df['x'], temp_df['y'])
+                network.set_pois(var, temp_df[locals_dict['poi_x']], temp_df[locals_dict['poi_x']])
                 # poi queries return a df, no need to put through to_series function. 
                 values = eval(expression, globals(), locals_dict)
-                # index results to the parcel_df:
-                locals_dict[parcel_df_name][target] = values.loc[locals_dict[parcel_df_name].node_id].values
-                values = locals_dict[parcel_df_name][target]
-                traceable = True
 
+                # index results to the parcel_df:
+                locals_dict[parcel_df_name][target] = values.loc[locals_dict[parcel_df_name][locals_dict['node_id']]].values
+                values = locals_dict[parcel_df_name][target]
+                # if assignment is to a df that is not the parcel df, then cannot trace results
+                if target_df <> parcel_df_name:
+                    traceable = False
+                
             # panda df assignment:
             else:
                 values = to_series(eval(expression, globals(), locals_dict), target=target)
@@ -279,6 +282,7 @@ def buffer_variables(buffer_expressions,
                 # if assignment is to a df that is not the parcel df, then cannot trace results
                 if target_df <> parcel_df_name:
                     traceable = False
+                    
             np.seterr(**save_err)
             np.seterrcall(saved_handler)
 
@@ -299,7 +303,7 @@ def buffer_variables(buffer_expressions,
             # spec under the 'variable' column. 
             if traceable: 
                 trace_results.append((target, values[trace_rows]))
-
+        
         # update locals to allows us to ref previously assigned targets
         locals_dict[target] = values
 
@@ -320,10 +324,8 @@ def buffer_variables(buffer_expressions,
     variables = pd.DataFrame.from_items(variables)
 
     if trace_results is not None:
-
         trace_results = pd.DataFrame.from_items(trace_results)
         trace_results.index = locals_dict[parcel_df_name][trace_rows].index
-
         trace_results = undupe_column_names(trace_results)
 
         # add df columns to trace_results

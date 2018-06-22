@@ -10,13 +10,14 @@ from netbuffer.core import buffer
 from activitysim.core import tracing
 from activitysim.core import config
 from activitysim.core import inject
+from activitysim.core import pipeline
 
 logger = logging.getLogger(__name__)
 
 
 @inject.injectable()
-def buffer_parcels_spec(configs_dir):
-    f = os.path.join(configs_dir, 'buffering.csv')
+def buffer_parcels_spec(configs_dir, buffer_parcels_settings):
+    f = os.path.join(configs_dir, buffer_parcels_settings['buffer_parcels_spec'])
     return buffer.read_buffer_spec(f)
 
 
@@ -28,7 +29,7 @@ def buffer_parcels_settings(configs_dir):
 @inject.step()
 def buffer_parcels(settings, buffer_parcels_spec,
                    buffer_parcels_settings,
-                   parcel_data, data_dir, trace_parcels):
+                   parcel_data, data_dir, output_dir, trace_parcels):
 
     """
     Performs network buffering (using Pandana libary http://udst.github.io/pandana/)
@@ -47,47 +48,46 @@ def buffer_parcels(settings, buffer_parcels_spec,
     logger.info("Running buffer_parcels")
 
     constants = config.get_model_constants(buffer_parcels_settings)
-
-    #trace_parcels = settings['trace_parcels']
+    
     # create pandana network
-    # see pandana documentation to download and store a pandana network specific to the study area.
-    network_fname = os.path.join(data_dir, settings["buffer_network"])
+    network_fname = os.path.join(data_dir, buffer_parcels_settings["buffer_network"])
     network = pdna.Network.from_hdf5(network_fname)
     network.init_pois(num_categories=constants["num_categories"], 
-                      max_dist=constants["max_dist"], max_pois=constants["max_pois"])
+                        max_dist=constants["max_dist"], max_pois=constants["max_pois"])
 
     parcel_data_df = parcel_data.to_frame()
     parcel_data_df.reset_index(level=0, inplace=True)
 
     # attach the node_id of the nearest network node to each parcel
-    parcel_data_df['node_id'] = network.get_node_ids(parcel_data_df['xcoord_p'].values,
-                                                     parcel_data_df['ycoord_p'].values)
-    #parcel_data_df.set_index(constants['parcel_index'], inplace=True)
+    parcel_data_df[constants['nodes-id']] = network.get_node_ids(parcel_data_df[constants['parcels-x']].values,
+                                                     parcel_data_df[constants['parcels-y']].values)
+    parcel_data_df.set_index(constants['parcel_index'], inplace=True, drop=False)
     
     # trace parcels are specified by parcelid
-    if trace_parcels:
-        trace_parcel_rows = parcel_data_df.parcelid.isin(trace_parcels)
+    if 'trace_parcels' in buffer_parcels_settings:
+      trace_parcels = buffer_parcels_settings['trace_parcels']
+      trace_parcel_rows = parcel_data_df[constants['parcel_index']].isin(trace_parcels)
     else:
-        trace_parcel_rows = None
+      trace_parcel_rows = None
 
     # TO-FIX-reading the following df directly for now since easier table reading is being added.
     # this table provides the location of transit stops and types of transit they serve
     # used to find distance from parcels to nearest bus, light rail, commuter rail etc.
     # also- might be better to store in the master h5 file.
-    poi_fname = os.path.join(data_dir, settings["transit_stops"])
+    poi_fname = os.path.join(data_dir, buffer_parcels_settings["transit_stops"])
     poi_df = pd.read_csv(poi_fname, index_col=False)
-    poi_df['node_id'] = network.get_node_ids(poi_df['x'].values, poi_df['y'].values)
+    poi_df[constants['nodes-id']] = network.get_node_ids(poi_df[constants["stops-x"]].values, poi_df[constants["stops-y"]].values)
 
     # intersections:
     # combine from and to columns
-    all_nodes = pd.DataFrame(network.edges_df['from'].append(network.edges_df.to),
-                             columns=['node_id'])
+    all_nodes = pd.DataFrame(network.edges_df[constants["links-a"]].append(network.edges_df[constants["links-b"]]),
+                             columns=[constants['nodes-id']])
 
     # get the frequency of each node, which is the number of intersecting ways
-    intersections_df = pd.DataFrame(all_nodes.node_id.value_counts())
-    intersections_df = intersections_df.rename(columns={'node_id': 'edge_count'})
+    intersections_df = pd.DataFrame(all_nodes[constants['nodes-id']].value_counts())
+    intersections_df = intersections_df.rename(columns={constants['nodes-id']: 'edge_count'})
     intersections_df.reset_index(0, inplace=True)
-    intersections_df = intersections_df.rename(columns={'index': 'node_id'})
+    intersections_df = intersections_df.rename(columns={'index': constants['nodes-id']})
 
     # add a column for each way count
     intersections_df['nodes1'] = np.where(intersections_df['edge_count'] == 1, 1, 0)
@@ -96,9 +96,13 @@ def buffer_parcels(settings, buffer_parcels_spec,
 
     locals_d = {
         'network': network,
+        'node_id': constants['nodes-id'],
         'parcels_df': parcel_data_df,
         'intersections_df': intersections_df,
-        'poi_df': poi_df
+        'poi_df': poi_df,
+        'poi_x': constants['stops-x'],
+        'poi_y': constants['stops-y'],
+        'parcel_index': constants['parcel_index']
     }
 
     if constants is not None:
@@ -122,7 +126,7 @@ def buffer_parcels(settings, buffer_parcels_spec,
     if trace_parcels:
 
         if trace_results is None:
-            logger.warn("trace_parcels not found ini parcels = %s" % (trace_parcels))
+            logger.warn("trace_parcels not found in parcels = %s" % (trace_parcels))
         else:
             # 
             df = parcel_data_df.loc[parcel_data_df[trace_parcel_rows].index]
@@ -135,8 +139,34 @@ def buffer_parcels(settings, buffer_parcels_spec,
                              warn_if_empty=True)
 
             if trace_assigned_locals:
-                tracing.write_locals(df, file_name="accessibility_locals")
+                tracing.write_locals(df, file_name="netbuffer_locals")
+     
+    #write result
+    buffered_parcels_fname = os.path.join(output_dir, buffer_parcels_settings["parcel_output_file"])
+    pipeline.get_table("parcel_data").to_csv(buffered_parcels_fname, index=False)
 
-        
 
-   
+@inject.injectable()
+def create_network_settings(configs_dir):
+    return config.read_model_settings(configs_dir, 'create_network.yaml')
+
+
+@inject.step()
+def create_network(settings, create_network_settings, data_dir):
+
+    """
+    Build a Pandana network from CSV files
+    """
+
+    # create pandana network
+    logger.info("Running create_network")
+    nodes = pd.read_csv(os.path.join(data_dir, create_network_settings["nodes"]))
+    links = pd.read_csv(os.path.join(data_dir, create_network_settings["links"]))
+    
+    nodes.index = nodes[create_network_settings["nodes-id"]]
+    
+    network = pdna.Network(nodes[create_network_settings["nodes-x"]], nodes[create_network_settings["nodes-y"]], 
+                           links[create_network_settings["links-a"]], links[create_network_settings["links-b"]], 
+                           links[[create_network_settings["links-impedance"]]], twoway=create_network_settings["twoway"])
+    
+    network.save_hdf5(os.path.join(data_dir, create_network_settings["output"]))
