@@ -79,6 +79,7 @@ def test_buffer_variables(capsys, spec_name, net_name, parcel_name):
     locals_d = {
         'network': network,
         'parcels_df': parcel_data_df,
+        'node_id': 'node_id'
     }
     #parcel_data_df.set_index(constants['parcel_index'], inplace=True)
     #parcel_data_df.reset_index(level=0, inplace=True)

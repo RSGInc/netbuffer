@@ -1,0 +1,11 @@
+
+nodes: nodes.csv
+links: links.csv
+nodes-id: id
+nodes-x: x
+nodes-y: y
+links-a: from
+links-b: to
+links-impedance: distance
+twoway: True
+output: pandana_network.h5
