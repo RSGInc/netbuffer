@@ -1,14 +1,13 @@
 from ez_setup import use_setuptools
-use_setuptools()  # nopep8
-
 from setuptools import setup, find_packages
+use_setuptools()  # nopycodestyle
 
 with open('README.rst') as file:
     long_description = file.read()
 
 setup(
     name='netbuffer',
-    version='0.2',
+    version='0.3',
     description='Network based queries and aggregations on land use data',
     author='contributing authors',
     author_email='scoe@psrc.org',

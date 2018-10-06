@@ -130,10 +130,10 @@ def buffer_variables(buffer_expressions,
     targets as the assigned target name.
 
     parcel_df_name is the name of the data frame in locals_dict, which represents
-    point data, to which all buffering and network distance measurements are 
-    applied. In order to do this, each row (point) in parcel_df must be associated with it's 
-    nearest node in the Pandana network. This is achieved using the Pandana method 
-    network.get_node_ids. The buffering operations are performed on each node in the 
+    point data, to which all buffering and network distance measurements are
+    applied. In order to do this, each row (point) in parcel_df must be associated with it's
+    nearest node in the Pandana network. This is achieved using the Pandana method
+    network.get_node_ids. The buffering operations are performed on each node in the
     network, thus allowing the results to be joined to the parcel df via node_id. Only
     the results that share the same nodes in the parcel_df_name data frame
     are returned.
@@ -195,10 +195,11 @@ def buffer_variables(buffer_expressions,
         if x is None or np.isscalar(x):
             if target:
                 logger.warn("WARNING: assign_variables promoting scalar %s to series" % target)
-            x = pd.Series([x] * len(locals_dict[parcel_df_name].index), index=locals_dict[parcel_df_name].index)
+            x = pd.Series([x] * len(locals_dict[parcel_df_name].index),
+                          index=locals_dict[parcel_df_name].index)
         if not isinstance(x, pd.Series):
             x = pd.Series(x)
-        x.name = target 
+        x.name = target
 
         return x
 
@@ -209,16 +210,16 @@ def buffer_variables(buffer_expressions,
         if trace_rows.any():
             trace_results = []
             trace_assigned_locals = {}
-    
+
     # avoid touching caller's passed-in locals_d parameter (they may be looping)
     locals_dict = locals_dict.copy() if locals_dict is not None else {}
     local_keys = locals_dict.keys()
-    
-    l = []
+
+    le = []
     traceable = True
     # need to be able to identify which variables causes an error, which keeps
     # this from being expressed more parsimoniously
-    for e in zip(buffer_expressions.target, buffer_expressions.variable, 
+    for e in zip(buffer_expressions.target, buffer_expressions.variable,
                  buffer_expressions.target_df, buffer_expressions.expression):
         target, var, target_df, expression = e
 
@@ -242,34 +243,38 @@ def buffer_variables(buffer_expressions,
             save_err = np.seterr(all='log')
 
             network = locals_dict['network']
-            
+            print("solve expression: " + expression)
+
             # aggregate query
             if 'aggregate' in expression:
-                network.set(locals_dict[target_df][locals_dict['node_id']], 
+                network.set(locals_dict[target_df][locals_dict['node_id']],
                             variable=locals_dict[target_df][var], name=var)
                 values = to_series(eval(expression, globals(), locals_dict), target=target)
                 # index results to the parcel_df:
-                locals_dict[parcel_df_name][target] = values.loc[locals_dict[parcel_df_name][locals_dict['node_id']]].values
+                locals_dict[parcel_df_name][target] = \
+                    values.loc[locals_dict[parcel_df_name][locals_dict['node_id']]].values
                 values = locals_dict[parcel_df_name][target]
-                traceable = True 
-                
+                traceable = True
+
             # nearest poi
             elif 'nearest_pois' in expression:
-                # records we want to run nearest poi on should have a value of 1. Ex- Could have a table of transit stops, 
-                # where each column is a type of transit stop, e.g. light rail, and a value of 1 in the light rail column
-                # means that that stop is a light rail stop. 
+                # records we want to run nearest poi on should have a value of 1.
+                # Ex- Could have a table of transit stops,
+                # where each column is a type of transit stop, e.g. light rail, and a
+                # value of 1 in the light rail column
+                # means that that stop is a light rail stop.
                 temp_df = locals_dict[target_df][(locals_dict[target_df][var] == 1)]
-                network.set_pois(var, temp_df[locals_dict['poi_x']], temp_df[locals_dict['poi_x']])
-                # poi queries return a df, no need to put through to_series function. 
+                network.set_pois(var, temp_df[locals_dict['poi_x']], temp_df[locals_dict['poi_y']])
+                # poi queries return a df, no need to put through to_series function.
                 values = eval(expression, globals(), locals_dict)
-
                 # index results to the parcel_df:
-                locals_dict[parcel_df_name][target] = values.loc[locals_dict[parcel_df_name][locals_dict['node_id']]].values
+                locals_dict[parcel_df_name][target] = \
+                    values.loc[locals_dict[parcel_df_name][locals_dict['node_id']]].values
                 values = locals_dict[parcel_df_name][target]
                 # if assignment is to a df that is not the parcel df, then cannot trace results
-                if target_df <> parcel_df_name:
+                if target_df != parcel_df_name:
                     traceable = False
-                
+
             # panda df assignment:
             else:
                 values = to_series(eval(expression, globals(), locals_dict), target=target)
@@ -280,9 +285,9 @@ def buffer_variables(buffer_expressions,
                 locals_dict[target_df] = locals_dict[target_df].merge(pd.DataFrame(
                     values), how='left', left_index=True, right_index=True)
                 # if assignment is to a df that is not the parcel df, then cannot trace results
-                if target_df <> parcel_df_name:
+                if target_df != parcel_df_name:
                     traceable = False
-                    
+
             np.seterr(**save_err)
             np.seterrcall(saved_handler)
 
@@ -295,15 +300,15 @@ def buffer_variables(buffer_expressions,
             # values = to_series(None, target=target)
             raise err
 
-        l.append((target, values))
+        le.append((target, values))
 
         if trace_results is not None:
             # some calcs are not included in the final df so may not have the
             # parcels that being traced. These should have a value of 'None' in
-            # spec under the 'variable' column. 
-            if traceable: 
+            # spec under the 'variable' column.
+            if traceable:
                 trace_results.append((target, values[trace_rows]))
-        
+
         # update locals to allows us to ref previously assigned targets
         locals_dict[target] = values
 
@@ -313,7 +318,7 @@ def buffer_variables(buffer_expressions,
     # the first time we see them so they end up in execution order
     variables = []
     seen = set()
-    for statement in reversed(l):
+    for statement in reversed(le):
         # statement is a tuple (<target_name>, <eval results in pandas.Series>)
         target_name = statement[0]
         if not is_temp(target_name) and target_name not in seen:
@@ -322,13 +327,11 @@ def buffer_variables(buffer_expressions,
 
     # DataFrame from list of tuples [<target_name>, <eval results>), ...]
     variables = pd.DataFrame.from_items(variables)
-
     if trace_results is not None:
         trace_results = pd.DataFrame.from_items(trace_results)
         trace_results.index = locals_dict[parcel_df_name][trace_rows].index
         trace_results = undupe_column_names(trace_results)
 
         # add df columns to trace_results
-        #trace_results = pd.concat([locals_dict[parcel_df_name], trace_results], axis=1)
-
+        # trace_results = pd.concat([locals_dict[parcel_df_name], trace_results], axis=1)
     return variables, trace_results, trace_assigned_locals

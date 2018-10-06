@@ -1,15 +1,13 @@
 
 buffer_parcels_spec: buffering.csv
 buffer_network: pandana_network.h5
-transit_stops: transit_stops.csv
+pois: pois.csv
 parcel_output_file: parcels_out.csv
 
 CONSTANTS:
   nodes-id: id
   nodes-x: x
   nodes-y: y
-  stops-x: x
-  stops-y: y
   links-a: from
   links-b: to
   parcel_index: parcelid
@@ -18,6 +16,8 @@ CONSTANTS:
   max_dist: 16000
   max_pois: 1
   num_categories: 5
-  
+  pois-x: x
+  pois-y: y
+
 # trace parcel in buffering
 trace_parcels: [224715, 224860]
