@@ -17,7 +17,8 @@ logger = logging.getLogger(__name__)
 
 @inject.injectable()
 def buffer_parcels_spec(configs_dir, buffer_parcels_settings):
-    f = os.path.join(configs_dir, buffer_parcels_settings['buffer_parcels_spec'])
+    f = os.path.join(
+        configs_dir, buffer_parcels_settings['buffer_parcels_spec'])
     return buffer.read_buffer_spec(f)
 
 
