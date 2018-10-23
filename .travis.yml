@@ -29,7 +29,6 @@ install:
 - pip install activitysim
 - pip install .
 script:
-- pep8 netbuffer
 - py.test --boxed --cov netbuffer --cov-report term-missing
 after_success:
 - coveralls
