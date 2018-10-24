@@ -39,7 +39,7 @@ def trace_parcels(settings):
     parcels = settings.get('trace_parcels', None)
 
     if parcels and not (isinstance(parcels, list) and all(isinstance(x, int) for x in parcels)):
-        logger.warn("setting trace_parcels is wrong type, should be a list of integers, but was %s" 
+        logger.warn("setting trace_parcels is wrong type, should be a list of integers, but was %s"
                     % parcels)
         parcels = None
 

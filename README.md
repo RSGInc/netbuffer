@@ -10,3 +10,9 @@ on land use data.  NetBuffer is implemented in the
 ## Documentation
 
 https://psrc.github.io/netbuffer
+
+## Example
+
+```
+example_psrc\python run_netbuffer.py
+```
