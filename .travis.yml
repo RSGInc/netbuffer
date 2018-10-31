@@ -39,4 +39,4 @@ notifications:
 env:
   global:
   # GH_TOKEN
-  - secure: Lx7qJsqlshrmPWAZbYXOs0Pe0pvX1VyPuh22LPo8/7E7TqsMilps5U+0qp17Yg46CwzKgfnx+mrr0Emz2g7a2rj3VPeqsdSM2erOX/wuhKSOlqFNbzgD9CbuyaBdDdbLsuqrmOq8IZHWAOnHJoqn2L53rYl05mrN/PhZKN8M6O8=
+  - secure: travis_token

@@ -44,8 +44,8 @@ if [ "$TRAVIS_REPO_SLUG" == "psrc/netbuffer" ] && \
 
         cd ../../
         echo "Setting git attributes"
-        git config --global user.email "toliwaga@gmail.com"
-        git config --global user.name "Jeff Doyle"
+        git config --global user.email "coestefan@gmail.com"
+        git config --global user.name "Stefan Coe"
 
         echo "Cloning repository"
         git clone --quiet --single-branch --branch=gh-pages https://${GH_TOKEN}@github.com/psrc/netbuffer.git  gh-pages > /dev/null 2>&1
