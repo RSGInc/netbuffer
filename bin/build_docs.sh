@@ -48,7 +48,7 @@ if [ "$TRAVIS_REPO_SLUG" == "psrc/netbuffer" ] && \
         git config --global user.name "Stefan Coe"
 
         echo "Cloning repository"
-        git clone --quiet --single-branch --branch=gh-pages https://${GH_TOKEN}@github.com/psrc/netbuffer.git  gh-pages > /dev/null 2>&1
+        git clone --quiet --single-branch --branch=gh-pages https://${GH_TOKEN}@github.com/psrc/netbuffer.git  
 
         cd gh-pages
         rm -rf *
