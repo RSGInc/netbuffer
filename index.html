@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>ActivitySim &mdash; ActivitySim 0.3dev1 documentation</title>
+  <title>NetBuffer &mdash; NetBuffer 0.1 documentation</title>
   
 
   
@@ -24,26 +24,17 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="ActivitySim 0.3dev1 documentation" href="#"/>
-        <link rel="next" title="Getting Started" href="gettingstarted.html"/> 
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -55,7 +46,7 @@
           
 
           
-            <a href="#" class="icon icon-home"> ActivitySim
+            <a href="#" class="icon icon-home"> NetBuffer
           
 
           
@@ -65,7 +56,7 @@
             
             
               <div class="version">
-                0.3dev1
+                0.1
               </div>
             
           
@@ -89,15 +80,18 @@
               
             
             
-              <ul>
-<li class="toctree-l1"><a class="reference internal" href="gettingstarted.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="howitworks.html">How the System Works</a></li>
-<li class="toctree-l1"><a class="reference internal" href="dataschema.html">Data Schema</a></li>
-<li class="toctree-l1"><a class="reference internal" href="core.html">Core Components</a></li>
-<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a></li>
-<li class="toctree-l1"><a class="reference internal" href="development.html">Development</a></li>
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">NetBuffer</a><ul>
+<li><a class="reference internal" href="#module-netbuffer.abm.models.buffering">API</a><ul>
+<li><a class="reference internal" href="#contents">Contents</a></li>
 </ul>
-
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+</div>
             
           
         </div>
@@ -107,17 +101,18 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="#">ActivitySim</a>
+          <a href="#">NetBuffer</a>
         
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -140,7 +135,7 @@
     
       <li><a href="#">Docs</a> &raquo;</li>
         
-      <li>ActivitySim</li>
+      <li>NetBuffer</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -159,144 +154,187 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="activitysim">
-<h1>ActivitySim<a class="headerlink" href="#activitysim" title="Permalink to this headline">¶</a></h1>
-<p>ActivitySim is an open platform for activity-based travel modeling. It emerged
-from a consortium of Metropolitan Planning Organizations (MPOs) and other
-transportation planning agencies that wanted to build a shared, open, platform
-that could be easily adapted to their individual needs, but would share a
-robust, efficient, and well-maintained common core.</p>
-<p>Additional information about the ActivitySim development effort is on the
-<a class="reference external" href="https://github.com/udst/activitysim/wiki">GitHub project wiki</a>.</p>
-<div class="section" id="software-design">
-<h2>Software Design<a class="headerlink" href="#software-design" title="Permalink to this headline">¶</a></h2>
-<p>The core software components of ActivitySim are described below.  ActivitySim is
-implemented in Python, and makes heavy use of the vectorized backend C/C++ libraries in
-<a class="reference external" href="http://pandas.pydata.org">pandas</a>  and <a class="reference external" href="http://numpy.org">numpy</a>.  The core design
-principle of the system is vectorization of for loops, and this principle
-is woven into the system wherever reasonable.  As a result, the Python portions of the software
-can be thought of as more of an orchestrator, data processor, etc. that integrates a series of
-C/C++ vectorized data table and matrix operations.  The model system formulates
-each simulation as a series of vectorized table operations and the Python layer
-is responsible for setting up and providing expressions to operate on these large data tables.</p>
-<div class="section" id="data-handling">
-<h3>Data Handling<a class="headerlink" href="#data-handling" title="Permalink to this headline">¶</a></h3>
-<p>ActivitySim operates on two data formats, <a class="reference external" href="https://www.hdfgroup.org/HDF5/">HDF5</a>
-and <a class="reference external" href="https://github.com/osPlanning/omx">Open Matrix (OMX)</a>.
-The HDF5 binary data container is used for managing flat files, including land use
-inputs, synthetic population files, and accessibility files.
-OMX, which is based on HDF5 as well, is used for managing network skims.</p>
-<p>Three key data structures in ActivitySim are:</p>
-<ul class="simple">
-<li><a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html">pandas.DataFrame</a> - A data table with rows and columns, similar to an R data frame, Excel worksheet, or database table</li>
-<li><a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.html">pandas.Series</a> - a vector of data, a column in a DataFrame table or a 1D array</li>
-<li><a class="reference external" href="http://docs.scipy.org/doc/numpy/reference/arrays.html">numpy.array</a> - an N-dimensional array of items of the same type, and is often a network skim matrix or collection of skim matrices by time-period or mode for example</li>
-</ul>
-</div>
-<div class="section" id="model-orchestrator">
-<h3>Model Orchestrator<a class="headerlink" href="#model-orchestrator" title="Permalink to this headline">¶</a></h3>
-<p>An ActivitySim model is a sequence of model / data processing steps, commonly known as a data pipeline.
-A well defined data pipeline has the ability to resume jobs at a known point, which facilitates
-debugging of problems with data and/or calculations.  It also allows for checkpointing model
-resources, such as the state of each person at a point in the model simulation.  Checkpointing also
-allows for regression testing of results at specified points in overall model run.</p>
-<p><a class="reference external" href="https://github.com/udst/orca">ORCA</a> is an orchestration/pipeline tool that defines model steps,
-dynamic data sources, and connects them to processing functions. ORCA defines dynamic data tables
-based on pandas DataFrames, columns based on pandas Series, and injectables (functions).  Model steps
-are executed as steps registered with the ORCA engine.  ActivitySim extends ORCA’s functionality by
-adding a <a class="reference internal" href="core.html#pipeline-in-detail"><span class="std std-ref">Pipeline</span></a>, that runs a series of ORCA model steps, manages the state of the data
-tables throughout the model run, allows for restarting at any model step, and integrates with the
-random number generation procedures (see <a class="reference internal" href="core.html#random-in-detail"><span class="std std-ref">Random</span></a>).</p>
-</div>
-<div class="section" id="expressions">
-<h3>Expressions<a class="headerlink" href="#expressions" title="Permalink to this headline">¶</a></h3>
-<p>ActivitySim exposes most of its model expressions in CSV files.  These model expression CSV files
-contain Python expressions, mainly pandas/numpy expression, and reference various input data tables
-and network skim matrices.  With this design, the Python code, which can be thought of as a generic expression
-engine, and the specific model calculations, such as the utilities, are separate.  This helps to avoid
-modifying the actual Python code when making changes to the models, such as during model calibration. An
-example of model expressions is found in the example auto ownership model specification file -
-<a class="reference external" href="https://github.com/UDST/activitysim/blob/master/example/configs/auto_ownership.csv">auto_ownership.csv</a>.
-Refer to the <a class="reference internal" href="gettingstarted.html#expressions-in-detail"><span class="std std-ref">Expressions</span></a> section for more detail.</p>
-</div>
-<div class="section" id="choice-models">
-<h3>Choice Models<a class="headerlink" href="#choice-models" title="Permalink to this headline">¶</a></h3>
-<p>ActivitySim currently supports multinomial (MNL) and nested logit (NL) choice models. Refer to <a class="reference internal" href="core.html#logit-in-detail"><span class="std std-ref">Logit</span></a>
-for more information.  It also supports custom expressions as noted above, which can often be used to
-code additional types of choice models.  In addition, developers can write their own choice models
-in Python and expose these through the framework.</p>
-</div>
-</div>
-<div class="section" id="contents">
-<h2>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
+  <div class="section" id="netbuffer">
+<h1>NetBuffer<a class="headerlink" href="#netbuffer" title="Permalink to this headline">¶</a></h1>
+<p>NetBuffer is a tool to perform network based queries and aggregations
+on land use data.  NetBuffer is implemented in the
+<a class="reference external" href="https://github.com/activitysim">ActivitySim</a> framework.</p>
+<div class="section" id="module-netbuffer.abm.models.buffering">
+<span id="api"></span><h2>API<a class="headerlink" href="#module-netbuffer.abm.models.buffering" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="netbuffer.abm.models.buffering.buffer_parcels">
+<code class="descclassname">netbuffer.abm.models.buffering.</code><code class="descname">buffer_parcels</code><span class="sig-paren">(</span><em>settings</em>, <em>buffer_parcels_spec</em>, <em>buffer_parcels_settings</em>, <em>parcel_data</em>, <em>data_dir</em>, <em>output_dir</em>, <em>trace_parcels</em><span class="sig-paren">)</span><a class="headerlink" href="#netbuffer.abm.models.buffering.buffer_parcels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs network buffering (using Pandana libary <a class="reference external" href="http://udst.github.io/pandana/">http://udst.github.io/pandana/</a>)
+for each point in parcel file using expressions from buffer_parcels_spec.</p>
+<p>The actual results depend on the expressions in buffer_parcels_spec, but this is initially
+intended to replicate PSRC’s Soundcast (Daysim) parcel accessibilities.</p>
+<p>Using a point file representing the centroid of a land use boundary (parcel), quanitifes
+the amount of some variable within a specified distance or the distance to a variable. For
+example, the total number of jobs within a half mile of each parcel or the distance to the
+nearest bus stop from each parcel.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="netbuffer.abm.models.buffering.create_network">
+<code class="descclassname">netbuffer.abm.models.buffering.</code><code class="descname">create_network</code><span class="sig-paren">(</span><em>settings</em>, <em>create_network_settings</em>, <em>data_dir</em><span class="sig-paren">)</span><a class="headerlink" href="#netbuffer.abm.models.buffering.create_network" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a Pandana network from CSV files</p>
+</dd></dl>
+
+<span class="target" id="module-netbuffer.core.buffer"></span><dl class="function">
+<dt id="netbuffer.core.buffer.buffer_variables">
+<code class="descclassname">netbuffer.core.buffer.</code><code class="descname">buffer_variables</code><span class="sig-paren">(</span><em>buffer_expressions</em>, <em>parcel_df_name</em>, <em>locals_dict</em>, <em>df_alias=None</em>, <em>trace_rows=None</em><span class="sig-paren">)</span><a class="headerlink" href="#netbuffer.core.buffer.buffer_variables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform network accessibility calculations (using Pandana libary
+<a class="reference external" href="http://udst.github.io/pandana/">http://udst.github.io/pandana/</a>) on point based data (e.g. parcel
+centroids) using a set of expressions from a spec in the context of
+a given data table.</p>
+<p>Expressions are evaluated using Python’s eval function.
+Python expressions have access to variables in locals_d.
+They also have access to previously assigned
+targets as the assigned target name.</p>
+<p>parcel_df_name is the name of the data frame in locals_dict, which represents
+point data, to which all buffering and network distance measurements are
+applied. In order to do this, each row (point) in parcel_df must be associated with it’s
+nearest node in the Pandana network. This is achieved using the Pandana method
+network.get_node_ids. The buffering operations are performed on each node in the
+network, thus allowing the results to be joined to the parcel df via node_id. Only
+the results that share the same nodes in the parcel_df_name data frame
+are returned.</p>
+<p>For example, in order to find the distance of each parcel to the nearest
+bus stop, we need a data frame representing bus stop locations and their
+nearest network node. Pandana then finds the distance from every node in
+the network to the nearest node that represents a bus stop. Next, only
+the distances for nodes that are associated with the parcel dataframe are
+kept and the results are indexed to the parcel dataframe.</p>
+<p>lowercase variables starting with underscore are temp variables (e.g. _local_var)
+and not returned except in trace_restults</p>
+<p>uppercase variables starting with underscore are temp variables (e.g. _LOCAL_SCALAR)
+and not returned except in trace_assigned_locals
+This is useful for defining general purpose local constants in expression file</p>
+<p>Users should take care that expressions should result in
+a Pandas Series (scalars will be automatically promoted to series.)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>buffer_expressions</strong> <span class="classifier-delimiter">:</span> <span class="classifier">pandas.DataFrame of target assignment expressions</span></dt>
+<dd><p class="first last">target: target column names
+variable: target variable to be buffered
+target_df: datafram that contains the variable to be buffered.
+expression: pandana, pandas or python expression to evaluate</p>
+</dd>
+<dt><strong>parcel_df_name: the name of the df in df_dict to which all results</strong></dt>
+<dd><p class="first last">will be indexed.</p>
+</dd>
+<dt><strong>df_dict</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dictionary of pandas.DataFrames. This must include the df</span></dt>
+<dd><p class="first last">referenced by parcel_df_name. A poi_df can be used to find distances
+to other points like bus stops. All poi’s should be stored in this
+one df. Other dfs can be used for aggregate buffering such as
+intersections_df.</p>
+</dd>
+<dt><strong>locals_dict</strong> <span class="classifier-delimiter">:</span> <span class="classifier">Dict</span></dt>
+<dd><p class="first last">This is a dictionary of local variables that will be the environment
+for an evaluation of “python” expression.</p>
+</dd>
+<dt><strong>trace_rows: series or array of bools to use as mask to select target rows to trace</strong></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>variables</strong> <span class="classifier-delimiter">:</span> <span class="classifier">pandas.DataFrame</span></dt>
+<dd><p class="first last">Will have the index of <cite>df</cite> and columns named by target and containing
+the result of evaluating expression</p>
+</dd>
+<dt><strong>trace_df</strong> <span class="classifier-delimiter">:</span> <span class="classifier">pandas.DataFrame or None</span></dt>
+<dd><p class="first last">a dataframe containing the eval result values for each assignment expression</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="netbuffer.core.buffer.read_buffer_spec">
+<code class="descclassname">netbuffer.core.buffer.</code><code class="descname">read_buffer_spec</code><span class="sig-paren">(</span><em>fname</em>, <em>description_name='Description'</em>, <em>target_name='Target'</em>, <em>variable_name='Variable'</em>, <em>target_df_name='TargetDF'</em>, <em>expression_name='Expression'</em><span class="sig-paren">)</span><a class="headerlink" href="#netbuffer.core.buffer.read_buffer_spec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a CSV model specification into a Pandas DataFrame or Series.</p>
+<p>The CSV is expected to have columns for component descriptions
+targets, and expressions,</p>
+<p>The CSV is required to have a header with column names. For example:</p>
+<blockquote>
+<div>Description,Target,Variable, TargetDF, Expression</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>fname</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">Name of a CSV spec file.</p>
+</dd>
+<dt><strong>description_name</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
+<dd><p class="first last">Name of the column in <cite>fname</cite> that contains the component description.</p>
+</dd>
+<dt><strong>target_name</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
+<dd><p class="first last">Name of the column in <cite>fname</cite> that contains the component target.</p>
+</dd>
+<dt><strong>variable_name</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
+<dd><p class="first last">Name of the column in <cite>fname</cite> that contains the variable target.</p>
+</dd>
+<dt><strong>target_df_name</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
+<dd><p class="first last">Name of the column in <cite>fname</cite> that contains the target dataframe.</p>
+</dd>
+<dt><strong>expression_name</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
+<dd><p class="first last">Name of the column in <cite>fname</cite> that contains the component expression.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>spec</strong> <span class="classifier-delimiter">:</span> <span class="classifier">pandas.DataFrame</span></dt>
+<dd><p class="first last">dataframe with three columns: [‘description’ ‘variable’ ‘target_df’ ‘target’ ‘expression’]</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="netbuffer.core.buffer.undupe_column_names">
+<code class="descclassname">netbuffer.core.buffer.</code><code class="descname">undupe_column_names</code><span class="sig-paren">(</span><em>df</em>, <em>template='{} ({})'</em><span class="sig-paren">)</span><a class="headerlink" href="#netbuffer.core.buffer.undupe_column_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>rename df column names so there are no duplicates (in place)</p>
+<p>e.g. if there are two columns named “dog”, the second column will be reformatted to “dog (2)”</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>df</strong> <span class="classifier-delimiter">:</span> <span class="classifier">pandas.DataFrame</span></dt>
+<dd><p class="first last">dataframe whose column names should be de-duplicated</p>
+</dd>
+<dt><strong>template</strong> <span class="classifier-delimiter">:</span> <span class="classifier">template taking two arguments (old_name, int) to use to rename columns</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>df</strong> <span class="classifier-delimiter">:</span> <span class="classifier">pandas.DataFrame</span></dt>
+<dd><p class="first last">dataframe that was renamed in place, for convenience in chaining</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<span class="target" id="module-netbuffer.abm.tables.parcels"></span><div class="section" id="contents">
+<h3>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h3>
 <div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="gettingstarted.html">Getting Started</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="gettingstarted.html#installation">Installation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="gettingstarted.html#expressions">Expressions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="gettingstarted.html#example">Example</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="howitworks.html">How the System Works</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="howitworks.html#execution-flow">Execution Flow</a></li>
-<li class="toctree-l2"><a class="reference internal" href="howitworks.html#creating-new-tables">Creating New Tables</a></li>
-<li class="toctree-l2"><a class="reference internal" href="howitworks.html#vectorized-3d-skim-indexing">Vectorized 3D Skim Indexing</a></li>
-<li class="toctree-l2"><a class="reference internal" href="howitworks.html#accessibilities-model-step">Accessibilities Model Step</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="dataschema.html">Data Schema</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="dataschema.html#accessibilities">Accessibilities</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dataschema.html#households">Households</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dataschema.html#land-use">Land use</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dataschema.html#persons">Persons</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dataschema.html#size-terms">Size terms</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dataschema.html#skims">Skims</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dataschema.html#tours">Tours</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dataschema.html#trips">Trips</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="core.html">Core Components</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="core.html#simulate">Simulate</a></li>
-<li class="toctree-l2"><a class="reference internal" href="core.html#skim">Skim</a></li>
-<li class="toctree-l2"><a class="reference internal" href="core.html#logit">Logit</a></li>
-<li class="toctree-l2"><a class="reference internal" href="core.html#pipeline">Pipeline</a></li>
-<li class="toctree-l2"><a class="reference internal" href="core.html#random">Random</a></li>
-<li class="toctree-l2"><a class="reference internal" href="core.html#tracing">Tracing</a></li>
-<li class="toctree-l2"><a class="reference internal" href="core.html#assign">Assign</a></li>
-<li class="toctree-l2"><a class="reference internal" href="core.html#utilities">Utilities</a></li>
-<li class="toctree-l2"><a class="reference internal" href="core.html#config">Config</a></li>
-<li class="toctree-l2"><a class="reference internal" href="core.html#inject-defaults">Inject_Defaults</a></li>
-<li class="toctree-l2"><a class="reference internal" href="core.html#tests">Tests</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="models.html#accessibility">Accessibility</a></li>
-<li class="toctree-l2"><a class="reference internal" href="models.html#auto-ownership">Auto Ownership</a></li>
-<li class="toctree-l2"><a class="reference internal" href="models.html#coordinated-daily-activity-pattern-cdap">Coordinated Daily Activity Pattern (CDAP)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="models.html#destination-choice">Destination Choice</a></li>
-<li class="toctree-l2"><a class="reference internal" href="models.html#mandatory-scheduling">Mandatory Scheduling</a></li>
-<li class="toctree-l2"><a class="reference internal" href="models.html#mandatory-tour-frequency">Mandatory Tour Frequency</a></li>
-<li class="toctree-l2"><a class="reference internal" href="models.html#create-trips">Create Trips</a></li>
-<li class="toctree-l2"><a class="reference internal" href="models.html#mode-tour-and-trip">Mode (Tour and Trip)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="models.html#non-mandatory-scheduling">Non-Mandatory Scheduling</a></li>
-<li class="toctree-l2"><a class="reference internal" href="models.html#non-mandatory-tour-frequency">Non-Mandatory Tour Frequency</a></li>
-<li class="toctree-l2"><a class="reference internal" href="models.html#school-location">School Location</a></li>
-<li class="toctree-l2"><a class="reference internal" href="models.html#workplace-location">Workplace Location</a></li>
-<li class="toctree-l2"><a class="reference internal" href="models.html#util">Util</a></li>
-<li class="toctree-l2"><a class="reference internal" href="models.html#tests">Tests</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="development.html">Development</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="development.html#software-design">Software Design</a></li>
-<li class="toctree-l2"><a class="reference internal" href="development.html#style">Style</a></li>
-<li class="toctree-l2"><a class="reference internal" href="development.html#imports">Imports</a></li>
-<li class="toctree-l2"><a class="reference internal" href="development.html#working-together-in-the-repository">Working Together in the Repository</a></li>
-<li class="toctree-l2"><a class="reference internal" href="development.html#testing">Testing</a></li>
-<li class="toctree-l2"><a class="reference internal" href="development.html#documentation">Documentation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="development.html#releases">Releases</a></li>
-</ul>
-</li>
-</ul>
+</div>
 </div>
 </div>
 </div>
@@ -311,29 +349,20 @@ in Python and expose these through the framework.</p>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="gettingstarted.html" class="btn btn-neutral float-right" title="Getting Started" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-    </div>
   
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright contributing authors.
+        &copy; Copyright contributing authors
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -348,36 +377,24 @@ in Python and expose these through the framework.</p>
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'0.3dev1',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>
