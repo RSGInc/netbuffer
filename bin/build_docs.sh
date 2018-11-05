@@ -33,9 +33,9 @@ if [ "$TRAVIS_REPO_SLUG" == "psrc/netbuffer" ] && \
         [ "$TRAVIS_PULL_REQUEST" == "false" ] && \
         [ "$ACTUAL_TRAVIS_JOB_NUMBER" == "1" ]; then
 
-        echo "Installing dependencies"
-        conda install --yes --quiet sphinx numpydoc
-        pip install sphinx_rtd_theme
+        #echo "Installing dependencies"
+        #conda install --yes --quiet sphinx numpydoc
+        #pip install sphinx_rtd_theme
 
         echo "Building docs"
         cd docs
@@ -45,10 +45,10 @@ if [ "$TRAVIS_REPO_SLUG" == "psrc/netbuffer" ] && \
         cd ../../
         echo "Setting git attributes"
         git config --global user.email "coestefan@gmail.com"
-        git config --global user.name "Stefan Coe"
+        git config --global user.name "stefancoe"
 
         echo "Cloning repository"
-        git clone --quiet --single-branch --branch=gh-pages https://${GH_TOKEN}@github.com/psrc/netbuffer.git  
+        git clone --quiet --single-branch --branch=gh-pages https://${GH_TOKEN}@github.com/psrc/netbuffer.git gh-pages > /dev/null 2>&1  
 
         cd gh-pages
         rm -rf *
