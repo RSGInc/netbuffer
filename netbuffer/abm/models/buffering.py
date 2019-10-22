@@ -24,7 +24,7 @@ def buffer_parcels_spec(configs_dir, buffer_parcels_settings):
 
 @inject.injectable()
 def buffer_parcels_settings(configs_dir):
-    return config.read_model_settings(configs_dir, 'buffer_parcels.yaml')
+    return config.read_model_settings('buffer_parcels.yaml')
 
 
 @inject.step()
@@ -64,7 +64,7 @@ def buffer_parcels(settings, buffer_parcels_spec,
         network.get_node_ids(parcel_data_df[constants['parcels-x']].values,
                              parcel_data_df[constants['parcels-y']].values)
     parcel_data_df.set_index(constants['parcel_index'], inplace=True, drop=False)
-    inject.add_table('parcel_data', parcel_data_df)
+    inject.add_table('parcel_data', parcel_data_df, replace=True)
 
     # trace parcels are specified by parcelid
     if 'trace_parcels' in buffer_parcels_settings:
