@@ -1,4 +1,5 @@
+from netbuffer.core import network
 
-import misc
-import tables
-import models
+from . import misc
+from . import tables
+from . import models

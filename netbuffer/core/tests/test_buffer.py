@@ -6,7 +6,6 @@ import pandas as pd
 import pandas.util.testing as pdt
 import pandana as pdna
 import pytest
-import orca
 
 
 from .. import buffer
@@ -34,8 +33,8 @@ def net_name(data_dir):
 
 
 @pytest.fixture(scope='module')
-def parcel_name(data_dir):
-    return os.path.join(data_dir, 'test_parcels.csv')
+def zone_name(data_dir):
+    return os.path.join(data_dir, 'test_zones.csv')
 
 
 @pytest.fixture(scope='module')
@@ -57,35 +56,36 @@ def test_read_model_spec(spec_name):
     assert list(spec.columns) == ['description', 'target', 'variable', 'target_df', 'expression']
 
 
-def test_buffer_variables(capsys, spec_name, net_name, parcel_name):
+def test_buffer_variables(capsys, spec_name, net_name, zone_name):
 
     spec = buffer.read_buffer_spec(spec_name)
 
     network = pdna.Network.from_hdf5(net_name)
-    parcel_data_df = pd.read_csv(parcel_name)
-    assert len(parcel_data_df) == 3
+    zone_data_df = pd.read_csv(zone_name, index_col='zoneid')
+    assert len(zone_data_df) == 3
 
-    parcel_data_df['node_id'] = network.get_node_ids(parcel_data_df['xcoord_p'].values,
-                                                     parcel_data_df['ycoord_p'].values)
+    zone_data_df['node_id'] = network.get_node_ids(zone_data_df['xcoord_p'],
+                                                   zone_data_df['ycoord_p'])
 
-    # parcel 1219983 should be assigned to network node 82030 becuase it is the nearest node:
-    assert int(parcel_data_df[parcel_data_df['parcelid'] == 735313].node_id) == 84076
-    print parcel_data_df[parcel_data_df['parcelid'] == 735313].node_id
+    print(zone_data_df.index)
+    # zone 1219983 should be assigned to network node 82030 becuase it is the nearest node:
+    assert int(zone_data_df.loc[735313].node_id) == 84076
+    print(zone_data_df.loc[735313].node_id)
 
     locals_d = {
         'network': network,
-        'parcels_df': parcel_data_df,
+        'zones_df': zone_data_df,
         'node_id': 'node_id'
     }
-    # parcel_data_df.set_index(constants['parcel_index'], inplace=True)
-    # parcel_data_df.reset_index(level=0, inplace=True)
+    # zone_data_df.set_index(constants['zone_index'], inplace=True)
+    # zone_data_df.reset_index(level=0, inplace=True)
 
     # locals_d = {'CONSTANT': 7, '_shadow': 99}
 
     results, trace_results, trace_assigned_locals \
-        = buffer.buffer_variables(spec, 'parcels_df', locals_d, trace_rows=None)
+        = buffer.buffer_variables(spec, 'zones_df', locals_d, trace_rows=None)
 
-    print results.columns
+    print(results.columns)
 
     assert list(results.columns) == ['target1', 'target2', 'target3']
     assert list(results.target1) == [382, 382, 382]
@@ -94,16 +94,16 @@ def test_buffer_variables(capsys, spec_name, net_name, parcel_name):
     assert trace_results is None
     assert trace_assigned_locals is None
 
-    trace_parcel_rows = parcel_data_df.parcelid.isin([735313])
+    trace_zone_rows = zone_data_df.index.isin([735313])
 
     results, trace_results, trace_assigned_locals \
-        = buffer.buffer_variables(spec, 'parcels_df', locals_d, trace_rows=trace_parcel_rows)
+        = buffer.buffer_variables(spec, 'zones_df', locals_d, trace_rows=trace_zone_rows)
 
     # should get same results as before
     assert list(results.target3) == [383, 383, 383]
 
     # should assign trace_results for second row in data
-    print trace_results
+    print(trace_results)
 
     # assert trace_results is not None
     # assert '_temp' in trace_results.columns

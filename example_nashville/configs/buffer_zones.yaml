@@ -1,0 +1,11 @@
+# I/O
+buffer_zones_spec: buffering.csv
+pois: poi.csv
+
+CONSTANTS:
+  max_pois: 1
+  pois-x: x
+  pois-y: y
+
+# trace zone in buffering
+trace_zones: [11469]
