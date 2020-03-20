@@ -15,10 +15,9 @@ Here are some simple steps to install the package and run the example:
   `conda install pandana --channel conda-forge`
 4. Install Netbuffer:
   * `git clone https://github.com/RSGInc/netbuffer.git`
-  * (optional) Run `git checkout nashville` to test the new Nashville-specific changes
   * `cd netbuffer`
   * `pip install .`
-5. Revert geopandas 
+5. Revert geopandas (if needed)
   `conda install geopandas=0.6.3 -c conda-forge`
 6. Run the example:
   * `cd example_nashville`
