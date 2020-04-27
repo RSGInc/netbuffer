@@ -1,4 +1,4 @@
-empedu_p,empfoo_p,empgov_p,empind_p,empmed_p,empofc_p,empoth_p,empret_p,emprsc_p,empsvc_p,emptot_p,hh_p,lutype_p,parcelid,parkdy_p,parkhr_p,ppricdyp,pprichrp,sqft_p,stugrd_p,stuhgh_p,stuuni_p,taz_p,xcoord_p,ycoord_p,nparks,aparks
+empedu_p,empfoo_p,empgov_p,empind_p,empmed_p,empofc_p,empoth_p,empret_p,emprsc_p,empsvc_p,emptot_p,hh_p,lutype_p,zoneid,parkdy_p,parkhr_p,ppricdyp,pprichrp,sqft_p,stugrd_p,stuhgh_p,stuuni_p,taz_p,xcoord_p,ycoord_p,nparks,aparks
 0,0,0,0,0,14,0,0,0,12,26,0,20,735313,229,229,1800,450,13306,0,0,0,535,1270156.801990000100000,223586.093471000000000,0,0
 1,6,0,0,0,159,0,0,0,32,198,0,18,735314,0,0,0,0,6468,0,0,0,535,1270310.501669999900000,223572.499966000000000,0,0
 0,6,0,0,1,118,0,0,0,33,158,0,18,735315,0,0,0,0,6652,0,0,0,535,1270202.669190000000000,223508.634035000000000,0,0

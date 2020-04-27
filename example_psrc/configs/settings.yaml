@@ -1,8 +1,15 @@
+input_table_list:
+  - tablename: zone_data
+    filename: parcels.h5
+    index_col: parcelid
+    h5_tablename: parcel_data
 
-store: parcels.h5
+network: build
+network_settings_file: create_network.yaml
+
+max_dist: 16000 # in meters
+zones_lon: xcoord_p
+zones_lat: ycoord_p
 
 models:
-  # Cannot initialize the pandana network twice so need to run two Python sessions 
-  # AssertionError: Adding more networks than have been reserved
-  # - create_network 
-  - buffer_parcels
+  - buffer_zones

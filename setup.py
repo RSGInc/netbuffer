@@ -7,7 +7,7 @@ with open('README.rst') as file:
 
 setup(
     name='netbuffer',
-    version='0.3',
+    version='0.4',
     description='Network based queries and aggregations on land use data',
     author='contributing authors',
     author_email='scoe@psrc.org',
@@ -15,16 +15,15 @@ setup(
     url='https://github.com/psrc/netbuffer',
     classifiers=[
         'Development Status :: 4 - Beta',
-        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3 :: Only',
         'License :: OSI Approved :: BSD License'
     ],
     long_description=long_description,
     packages=find_packages(exclude=['*.tests']),
     install_requires=[
-        'numpy >= 1.8.0',
-        'pandas >= 0.18.0',
-        'orca >= 1.1',
-        'activitysim >= 0.9.1',
-        'pandana == 0.3'
+        'activitysim >= 0.9.2',
+        'numpy >= 1.18.0',
+        'pandas >= 0.25.0',
+        # 'pandana >= 0.4.4'
     ]
 )

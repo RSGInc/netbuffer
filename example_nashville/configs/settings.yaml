@@ -1,0 +1,20 @@
+# input tables
+input_table_list:
+  - tablename: zone_data  # required
+    filename: zones_sample.csv
+    index_col: parcelid
+
+network: read # options: build, read, download
+saved_network: pandana_network_sample.h5  # network: read
+meters_to_miles: True  # network: download. Convert distance units from meters to miles.
+
+max_dist: 2
+zones_lon: long
+zones_lat: lat
+
+models:
+  - nearby_zones
+  - buffer_zones
+  - write_daysim_files
+
+# resume_after: buffer_zones

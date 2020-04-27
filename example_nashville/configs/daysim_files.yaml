@@ -1,0 +1,109 @@
+nearby_zones:
+  outfile: node_distance.csv
+  delimiter: comma  # options: space, comma, tab
+  header: False
+  cols:
+    - from
+    - to
+    - total_dist
+
+buffered_zones:
+  outfile: nashville_maz_lu_buffered.csv
+  delimiter: space
+  header: True
+  cols:
+    - parcelid
+    - xcoord_p
+    - ycoord_p
+    - sqft_p
+    - taz_p
+    - lutype_p
+    - hh_p
+    - stugrd_p
+    - stuhgh_p
+    - stuuni_p
+    - empedu_p
+    - empfoo_p
+    - empgov_p
+    - empind_p
+    - empmed_p
+    - empofc_p
+    - empret_p
+    - empsvc_p
+    - empoth_p
+    - emptot_p
+    - parkdy_p
+    - parkhr_p
+    - ppricdyp
+    - pprichrp
+    - hh_1
+    - stugrd_1
+    - stuhgh_1
+    - stuuni_1
+    - empedu_1
+    - empfoo_1
+    - empgov_1
+    - empind_1
+    - empmed_1
+    - empofc_1
+    - empret_1
+    - empsvc_1
+    - empoth_1
+    - emptot_1
+    - parkdy_1
+    - parkhr_1
+    - ppricdy1
+    - pprichr1
+    - nodes1_1
+    - nodes3_1
+    - nodes4_1
+    - tstops_1
+    - nparks_1
+    - aparks_1
+    - hh_2
+    - stugrd_2
+    - stuhgh_2
+    - stuuni_2
+    - empedu_2
+    - empfoo_2
+    - empgov_2
+    - empind_2
+    - empmed_2
+    - empofc_2
+    - empret_2
+    - empsvc_2
+    - empoth_2
+    - emptot_2
+    - parkdy_2
+    - parkhr_2
+    - ppricdy2
+    - pprichr2
+    - nodes1_2
+    - nodes3_2
+    - nodes4_2
+    - tstops_2
+    - nparks_2
+    - aparks_2
+    - dist_lbus
+    - dist_ebus
+    - dist_crt
+    - dist_fry
+    - dist_lrt
+  col_types:
+    parcelid: int64  # or float64, string
+    xcoord_p: int64
+    ycoord_p: int64
+    sqft_p: int64
+    taz_p: int64
+    lutype_p: int64
+
+network_files:
+  zone_to_node:
+    outfile: ParcelNode.dat
+    delimiter: space
+  node_distances:
+    outfile: NodeDistances.dat
+    delimiter: space
+  node_indices:
+    outfile: NodeIndex.dat
+    delimiter: space

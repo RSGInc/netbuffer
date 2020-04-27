@@ -10,6 +10,7 @@ import pandas as pd
 import yaml
 
 from activitysim.core import pipeline
+from activitysim.core import config
 
 warnings.filterwarnings('ignore', category=pd.io.pytables.PerformanceWarning)
 pd.options.mode.chained_assignment = None
@@ -34,13 +35,13 @@ def store(data_dir, settings):
 
 
 @inject.injectable(cache=True)
-def trace_parcels(settings):
+def trace_zones(settings):
 
-    parcels = settings.get('trace_parcels', None)
+    zones = settings.get('trace_zones', None)
 
-    if parcels and not (isinstance(parcels, list) and all(isinstance(x, int) for x in parcels)):
-        logger.warn("setting trace_parcels is wrong type, should be a list of integers, but was %s"
-                    % parcels)
-        parcels = None
+    if zones and not (isinstance(zones, list) and all(isinstance(x, int) for x in zones)):
+        logger.warn("setting trace_zones is wrong type, should be a list of integers, but was %s"
+                    % zones)
+        zones = None
 
-    return parcels
+    return zones
