@@ -7,19 +7,14 @@ on land use data.  NetBuffer is implemented in the
 
 Here are some simple steps to install the package and run the example:
 
-1. Download [Anaconda](https://www.anaconda.com/distribution/)
-2. Create and activate an Anaconda environment (i.e. a Python install just for this project).
-  * `conda create -n netbuffertest python=3.7`
-  * `activate netbuffertest`
-3. Install [Pandana](http://udst.github.io/pandana/installation.html):
-  `conda install pandana --channel conda-forge`
-4. Install Netbuffer:
+1. Install [Anaconda](https://www.anaconda.com/distribution/)
+2. Install Netbuffer:
   * `git clone https://github.com/RSGInc/netbuffer.git`
   * `cd netbuffer`
+  * `conda env create -n environment.yaml`
+  * `conda activate netbuffer`
   * `pip install .`
-5. Revert geopandas (if needed)
-  `conda install geopandas=0.6.3 -c conda-forge`
-6. Run the example:
+3. Run the example:
   * `cd example_nashville`
   * `python run_netbuffer.py`
 ```

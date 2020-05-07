@@ -6,9 +6,12 @@ input_table_list:
 
 network: read # options: build, read, download
 saved_network: pandana_network_sample.h5  # network: read
-meters_to_miles: True  # network: download. Convert distance units from meters to miles.
 
-max_dist: 2
+# distance units used in network/expressions
+# options: meters, miles
+distance_units: miles
+
+max_dist: 3
 zones_lon: long
 zones_lat: lat
 
@@ -17,4 +20,5 @@ models:
   - buffer_zones
   - write_daysim_files
 
-# resume_after: buffer_zones
+resume_after: buffer_zones
+

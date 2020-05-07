@@ -4,8 +4,8 @@ pois: poi.csv
 
 CONSTANTS:
   max_pois: 1
-  pois-x: x
-  pois-y: y
+  pois-x: XCOORD
+  pois-y: YCOORD
 
 # trace zone in buffering
 trace_zones: [11469]

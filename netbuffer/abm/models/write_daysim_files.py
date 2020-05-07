@@ -1,6 +1,7 @@
 import logging
 
 import pandas as pd
+import numpy as np
 
 from activitysim.core import config
 from activitysim.core import inject
@@ -96,33 +97,46 @@ def write_network_files(network_file_settings):
     nd_settings = network_file_settings.get('node_distances')
     ni_settings = network_file_settings.get('node_indices')
 
+    nearby_zones_df = pipeline.get_table('nearby_zones')
+    zone_nodes = pipeline.get_table('zone_data')['net_node_id']  # zone id to OSM node mapping
+
+    # The OSM node ids can get very big. Provide a way to remap
+    # them to smaller values in the output files.
+    if network_file_settings.get('remap_osm_ids', False):
+        unique_nodes = zone_nodes.unique()
+        remap = dict(zip(unique_nodes, np.arange(1, len(unique_nodes) + 1)))
+        zone_nodes = zone_nodes.map(remap)
+        nearby_zones_df['a_node_id'] = nearby_zones_df['a_node_id'].map(remap)
+        nearby_zones_df['b_node_id'] = nearby_zones_df['b_node_id'].map(remap)
+
     if ztn_settings:
-        zton_df = pipeline.get_table('zone_data')['net_node_id'].astype('int64')
-        zton_df.to_csv(config.output_file_path(ztn_settings.get('outfile')),
-                       sep=SEP[ztn_settings.get('delimiter', 'space')],
-                       header=False,
-                       index=True)
+        zone_nodes.to_csv(config.output_file_path(ztn_settings.get('outfile')),
+                          sep=SEP[ztn_settings.get('delimiter', 'space')],
+                          header=False,
+                          index=True)
 
     if nd_settings:
-        nearby_zones_df = pipeline.get_table('nearby_zones').reset_index()
         nodes = pd.DataFrame()
-        nodes['onode'] = nearby_zones_df['from']
-        nodes['dnode'] = nearby_zones_df['to']
 
-        miles = config.setting('meters_to_miles', default=False)
-        conversion = 5280 if miles else 3.28084
+        nodes['onode'] = nearby_zones_df.a_node_id
+        nodes['dnode'] = nearby_zones_df.b_node_id
 
-        nodes['feet'] = nearby_zones_df['total_dist'] * conversion
-        nodes.index.name = 'seq'
+        units = config.setting('distance_units', default='miles')
+        conversion = 5280 if units == 'miles' else 3.28084
+
+        nodes['feet'] = nearby_zones_df.node_to_node_dist * conversion
+        nodes = nodes.drop_duplicates(ignore_index=True).sort_values(by=['onode', 'dnode'])
+        nodes = nodes[nodes['onode'] != nodes['dnode']]
+
         nodes.astype('int64').to_csv(config.output_file_path(nd_settings.get('outfile')),
                                      sep=SEP[nd_settings.get('delimiter', 'space')],
                                      header=True,
-                                     index=True)
+                                     index=False)
 
         if not ni_settings:
             return
 
-        nodes.reset_index(inplace=True, drop=False)
+        nodes['seq'] = np.arange(1, nodes.shape[0] + 1)
         index_df = pd.DataFrame(index=nodes['onode'].unique())
         index_df['firstrec'] = nodes.groupby('onode').first()['seq']
         index_df['lastrec'] = nodes.groupby('onode').last()['seq']

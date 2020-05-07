@@ -243,7 +243,7 @@ def buffer_variables(buffer_expressions,
             save_err = np.seterr(all='log')
 
             network = locals_dict['network']
-            logger.debug("solving expression: %s" % expression)
+            logger.debug("solving expression: %s" % target)
 
             # aggregate query
             if 'aggregate' in expression:
@@ -264,16 +264,21 @@ def buffer_variables(buffer_expressions,
                 # value of 1 in the light rail column
                 # means that that stop is a light rail stop.
                 temp_df = locals_dict[target_df][(locals_dict[target_df][var] == 1)]
-                network.set_pois(category=var,
-                                 maxdist=locals_dict['max_dist'],
-                                 maxitems=locals_dict['max_pois'],
-                                 x_col=temp_df[locals_dict['poi_x']],
-                                 y_col=temp_df[locals_dict['poi_y']])
-                # poi queries return a df, no need to put through to_series function.
-                values = eval(expression, globals(), locals_dict)
-                # index results to the zone_df:
-                locals_dict[zone_df_name][target] = \
-                    values.loc[locals_dict[zone_df_name][locals_dict['node_id']]].values
+
+                if not temp_df.empty:
+                    network.set_pois(category=var,
+                                     maxdist=locals_dict['max_dist'],
+                                     maxitems=locals_dict['max_pois'],
+                                     x_col=temp_df[locals_dict['poi_x']],
+                                     y_col=temp_df[locals_dict['poi_y']])
+                    # poi queries return a df, no need to put through to_series function.
+                    values = eval(expression, globals(), locals_dict)
+                    # index results to the zone_df:
+                    locals_dict[zone_df_name][target] = \
+                        values.loc[locals_dict[zone_df_name][locals_dict['node_id']]].values
+                else:
+                    locals_dict[zone_df_name][target] = 999
+
                 values = locals_dict[zone_df_name][target]
                 # if assignment is to a df that is not the zone df, then cannot trace results
                 if target_df != zone_df_name:
