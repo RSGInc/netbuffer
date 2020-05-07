@@ -1,14 +1,19 @@
 nearby_zones:
   outfile: node_distance.csv
   delimiter: comma  # options: space, comma, tab
-  header: False
+  header: True
   cols:
-    - from
-    - to
-    - total_dist
+    - a_node_id
+    - b_node_id
+    - a_zone_id
+    - b_zone_id
+    - a_connector_dist  # dist from a_zone to nearest node
+    - b_connector_dist  # dist from b_zone to nearest node
+    - node_to_node_dist
+    - total_dist  # total distance from a_zone to b_zone
 
 buffered_zones:
-  outfile: nashville_maz_lu_buffered.csv
+  outfile: nashville_maz_lu_buffered.dat
   delimiter: space
   header: True
   cols:
@@ -98,6 +103,8 @@ buffered_zones:
     lutype_p: int64
 
 network_files:
+  # use 1-based consecutive ids for network nodes instead of IDs from OSM
+  remap_osm_ids: True
   zone_to_node:
     outfile: ParcelNode.dat
     delimiter: space

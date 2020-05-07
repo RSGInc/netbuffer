@@ -52,7 +52,6 @@ def nearby_zones(zone_data, network, settings):
     # keep only zone snap nodes
     nodes_to_keep = zones['net_node_id'].value_counts().index
     near_zones = all_net_nodes.loc[all_net_nodes.index.isin(nodes_to_keep)]
-
     zone_pairs = build_zone_pairs_df(near_zones, max_num_pois, zones, settings)
 
     pipeline.replace_table('nearby_zones', zone_pairs)
@@ -80,8 +79,10 @@ def get_nearest_network_nodes(zone_data, network, settings):
     lat2 = np.asarray(zones['net_node_y'])
     _, _, net_node_dist = geod.inv(lon1, lat1, lon2, lat2)
 
-    miles = settings.get('meters_to_miles', False)
-    zones['net_node_dist'] = net_node_dist / 1609.34 if miles else net_node_dist
+    units = settings.get('distance_units', 'meters')
+    assert units in ['meters', 'miles'], "'distance_units' setting must be 'meters' or 'miles'"
+
+    zones['net_node_dist'] = net_node_dist / 1609.34 if units == 'miles' else net_node_dist
 
     inject.add_table('zone_data', zones, replace=True)
 
@@ -89,28 +90,41 @@ def get_nearest_network_nodes(zone_data, network, settings):
 
 
 def build_zone_pairs_df(near_zones, max_num_pois, zones, settings):
+    """
+    Pandana's `nearest_pois` returns a DataFrame with
+        index: node_id
+        column[i]: distance from index node to ith closest poi (zone)
+        column[i*2]: zone id for ith closest poi
+    """
     logger.debug('building zone pairs distance table')
     dists_cols = near_zones.columns[:max_num_pois]
-    nodes_cols = near_zones.columns[max_num_pois:max_num_pois*2]
+    zones_cols = near_zones.columns[max_num_pois:max_num_pois*2]
     dists_df = near_zones[dists_cols].copy()
-    nodes_df = near_zones[nodes_cols].copy().rename(columns=dict(zip(nodes_cols, dists_cols)))
+    zones_df = near_zones[zones_cols].copy()
 
-    node_pairs = pd.concat([nodes_df, dists_df],
-                           keys=['to', 'distance'],
-                           join='inner',
-                           axis=1).replace(settings['max_dist'], np.nan).stack()
+    zone_pairs = pd.DataFrame()
+    zone_pairs['a_node_id'] = np.repeat(near_zones.index, max_num_pois)
+    zone_pairs['b_zone_id'] = zones_df.values.reshape(len(near_zones.index) * max_num_pois)
+    zone_pairs['node_to_node_dist'] = dists_df.values.reshape(len(near_zones.index) * max_num_pois)
 
-    # explode from network nodes to zones
-    logger.debug('joining network nodes to zones')
-    zone_pairs = node_pairs.merge(zones, how='outer', left_on='id', right_on='net_node_id')
-    zone_pairs.index.name = 'from'
+    # drop rows with dist==max_dist and with no to_zone
+    zone_pairs = zone_pairs[zone_pairs.node_to_node_dist != settings['max_dist']].dropna()
+    zone_pairs['b_zone_id'] = zone_pairs['b_zone_id'].astype('int')
 
-    # add connector distances and then reduce set
-    zone_pairs = zone_pairs.join(zones['net_node_dist'], on='to', rsuffix='_to_zone')
+    # add zone/node ids
+    zone_pairs['a_zone_id'] = zone_pairs['a_node_id'].map(dict(zip(zones.net_node_id, zones.index)))
+    zone_pairs['b_node_id'] = zone_pairs['b_zone_id'].map(zones.net_node_id)
+
+    # add connector distances
+    zone_pairs['a_connector_dist'] = zone_pairs['a_zone_id'].map(zones.net_node_dist)
+    zone_pairs['b_connector_dist'] = zone_pairs['b_zone_id'].map(zones.net_node_dist)
+
+    # calculate total zone-to-zone distance and reduce set
     zone_pairs['total_dist'] = \
-        zone_pairs['net_node_dist'] + \
-        zone_pairs['distance'] + \
-        zone_pairs['net_node_dist_to_zone']
+        zone_pairs['a_connector_dist'] + \
+        zone_pairs['node_to_node_dist'] + \
+        zone_pairs['b_connector_dist']
+
     zone_pairs = zone_pairs.loc[zone_pairs['total_dist'] < settings['max_dist']]
 
-    return zone_pairs[['to', 'distance', 'net_node_dist', 'net_node_dist_to_zone', 'total_dist']]
+    return zone_pairs

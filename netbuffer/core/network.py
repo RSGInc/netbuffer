@@ -79,7 +79,7 @@ def get_osm_network(zone_data, settings):
     logger.info('getting osm network')
     zones_df = zone_data.to_frame()
 
-    miles = settings.get('meters_to_miles', False)
+    miles = settings.get('distance_units') == 'miles'
     # distance to degrees: 111 km = 69 miles = 1 degree of long (y), 3mi = 0.043
     conversion = 69 if miles else 111 * 1000
     buffer = settings.get('max_dist') / conversion

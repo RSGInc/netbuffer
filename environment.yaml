@@ -1,0 +1,8 @@
+name: netbuffer 
+channels:
+- conda-forge
+dependencies:
+- python>=3.6
+- pandana=0.4.4
+- geopandas=0.6.3
+- pip
