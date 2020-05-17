@@ -287,6 +287,7 @@ def buffer_variables(buffer_expressions,
             # panda df assignment:
             else:
                 values = to_series(eval(expression, globals(), locals_dict), target=target)
+                values.index = locals_dict[target_df].index # must be the same df as in expression
                 # the target_df might need this column for a subsequent buffer operation
                 # delete if exists:
                 if target in locals_dict[target_df].columns:
