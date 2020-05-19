@@ -1,5 +1,6 @@
+os: linux
+dist: xenial
 language: python
-sudo: false
 python:
 - '3.7'
 install:
@@ -32,16 +33,8 @@ after_success:
 deploy:
   provider: pages
   local_dir: docs/_build/html
-  skip_cleanup: true
-  github_token: $GH_TOKEN
+  token: $GH_TOKEN
   keep_history: true
   on:
     branch: master
 
-notifications:
-  slack:
-    secure: Dpp+zBrnPGBHXrYWjwHy/bnHvhINfepSIiViwKfBZizBvTDvzSJfu6gCH+/lQ3squF3D4qTWwxB+LQ9V6KTYhuma8vQVisyneI6ARjUI/qgX6aJjuvmDDGPk6DVeDow7+aCLZ8VEHRhSjwy+dv0Ij0rxI6I94xPVwXUkk7ZjcK0=
-env:
-  global:
-  # GH_TOKEN
-    secure: pd27nfVapj5KSMJhRB8op3S6U1EB9//rsyXEv59mIwYAc6bMLfaUXh6/2D+TMncdMWsbMjIyIvduYEoTbLojrsJNm+nYaCfx5TzAiGGY6zk0LgS/J+oM3TzWa5MN/h4n6z49CQFdnfOp6EGDioJGEhcwJMgqiqZI/2gaZhGWaVtobNGr4nireEp6H2dD3rVriAD6QcPrqRWP5dzE2b7z2+3b+0N0HpR71DtKGWpSbg9xvpHfRGDSBUOUi7JVaReSW+9zNb4U5yCFp+4DnTQoND20tg41i7EYn0RdhNy7CjSlySf6z4Ykmftto4dXobr8aqcAwUuXPvdlJ3GnVal8+qKaqZnvxdTLNdo7mQGt5j7HB790ZdwROtAyxCP8o/htssujibWdbqEnGA87aT9WMUazC2QkVAERNQcH62xy85e1qoyTXYTnyI+0sgdBFM+tZGt4v47RWOEV49RpuW8v2sV7NzFoE2TV+FTjuk6sUVT9EQqACLtVg9Tq34UD37ExxtD+k1ExfRxcS/g/EVjcvxESLeq4gXGIF8YWLQlP7kv1DGDm9HrGQw2srX9xfqIOUEbDLdb7EGz1JPvRMam/zc6Q5qom682iBF+3C2+VP6eMwT8XSkpZneNeubC3cn5eSCWDtSwVjpsDimvXgveXLajAEBoufYZhpvXpOrD1Cow=
