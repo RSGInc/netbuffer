@@ -1,0 +1,453 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Example &mdash; NetBuffer 0.4
+ documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Getting Started" href="gettingstarted.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> NetBuffer
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.4
+
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="gettingstarted.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Example</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#example-model-design">Example Model Design</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#setup">Setup</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#folder-and-file-setup">Folder and File Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#configuration">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#network">Network</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">NetBuffer</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Example</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/example.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="example">
+<span id="id1"></span><h1>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h1>
+<p>This page describes the example model design and how to setup and run the Nashville
+regional example.</p>
+<span class="target" id="index-0"></span><div class="section" id="example-model-design">
+<span id="index-1"></span><h2>Example Model Design<a class="headerlink" href="#example-model-design" title="Permalink to this headline">¶</a></h2>
+<p>Netbuffer contains two network models and one output model:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>nearby_zones</p></li>
+<li><p>buffer_zones</p></li>
+<li><p>write_daysim_files</p></li>
+</ul>
+</div></blockquote>
+<p>The main input for the network models is CSV file containing zone data. This file is called
+<code class="docutils literal notranslate"><span class="pre">zones_sample.csv</span></code> in the Nashville example.</p>
+<p><strong>nearby_zones</strong> calculates the nearby zones for each zone in the input file within a given distance
+(distance is network distance). It does this by finding the nearest network node for each zone,
+using Pandana’s <code class="docutils literal notranslate"><span class="pre">nearest_pois</span></code> algorithm to find the nearest network nodes.</p>
+<span class="target" id="module-netbuffer.abm.models.nearby_zones"></span><dl class="py function">
+<dt id="netbuffer.abm.models.nearby_zones.nearby_zones">
+<code class="sig-prename descclassname">netbuffer.abm.models.nearby_zones.</code><code class="sig-name descname">nearby_zones</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">zone_data</span></em>, <em class="sig-param"><span class="n">network</span></em>, <em class="sig-param"><span class="n">settings</span></em><span class="sig-paren">)</span><a class="headerlink" href="#netbuffer.abm.models.nearby_zones.nearby_zones" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates distances to nearby zones for each zone
+in the zone_data table. The ‘max_dist’ setting determines
+which zones are included in the calculation.</p>
+<p>Saves a ‘nearby_zones’ table to the pipeline with
+from/to/total_dist columns.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="netbuffer.abm.models.nearby_zones.get_nearest_network_nodes">
+<code class="sig-prename descclassname">netbuffer.abm.models.nearby_zones.</code><code class="sig-name descname">get_nearest_network_nodes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">zone_data</span></em>, <em class="sig-param"><span class="n">network</span></em>, <em class="sig-param"><span class="n">settings</span></em><span class="sig-paren">)</span><a class="headerlink" href="#netbuffer.abm.models.nearby_zones.get_nearest_network_nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates zone_data table with network data.</p>
+<p>Adds the nearest net_node_id for each zone and calculates the
+distance from the zone centroid to the network node.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="netbuffer.abm.models.nearby_zones.build_zone_pairs_df">
+<code class="sig-prename descclassname">netbuffer.abm.models.nearby_zones.</code><code class="sig-name descname">build_zone_pairs_df</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">near_zones</span></em>, <em class="sig-param"><span class="n">max_num_pois</span></em>, <em class="sig-param"><span class="n">zones</span></em>, <em class="sig-param"><span class="n">settings</span></em><span class="sig-paren">)</span><a class="headerlink" href="#netbuffer.abm.models.nearby_zones.build_zone_pairs_df" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Pandana’s <cite>nearest_pois</cite> returns a DataFrame with</dt><dd><p>index: node_id
+column[i]: distance from index node to ith closest poi (zone)
+column[i*2]: zone id for ith closest poi</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p><strong>buffer_zones</strong> takes two additional input files – a POI (Point of Interest) file and a Python
+expressions file – and performs custom operations on the zone data to calculate additional
+attributes for each input zone.</p>
+<span class="target" id="module-netbuffer.abm.models.buffer_zones"></span><dl class="py function">
+<dt id="netbuffer.abm.models.buffer_zones.buffer_zones">
+<code class="sig-prename descclassname">netbuffer.abm.models.buffer_zones.</code><code class="sig-name descname">buffer_zones</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">settings</span></em>, <em class="sig-param"><span class="n">buffer_zones_spec</span></em>, <em class="sig-param"><span class="n">buffer_zones_settings</span></em>, <em class="sig-param"><span class="n">zone_data</span></em>, <em class="sig-param"><span class="n">trace_zones</span></em>, <em class="sig-param"><span class="n">network</span></em><span class="sig-paren">)</span><a class="headerlink" href="#netbuffer.abm.models.buffer_zones.buffer_zones" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs network buffering (using Pandana libary <a class="reference external" href="http://udst.github.io/pandana/">http://udst.github.io/pandana/</a>)
+for each point in zone file using expressions from buffer_zones_spec.</p>
+<p>The actual results depend on the expressions in buffer_zones_spec, but this is initially
+intended to replicate PSRC’s Soundcast (Daysim) zone accessibilities.</p>
+<p>Using a point file representing the centroid of a land use boundary (zone), quanitifes
+the amount of some variable within a specified distance or the distance to a variable. For
+example, the total number of jobs within a half mile of each zone or the distance to the
+nearest bus stop from each zone.</p>
+<p>The following configs should be set in buffer_zones.yaml:</p>
+<ul class="simple">
+<li><p>buffer_zones_spec: expressions file</p></li>
+<li><p>pois: Point of Interest file</p></li>
+</ul>
+<p>The CONSTANTS hash is made availabe to the expressions parser.</p>
+<ul class="simple">
+<li><p>CONSTANTS:
+- max_pois: integer, maxitems used in nearest pois calculation
+- pois-x: longitude column in pois file
+- pois-y: latitude column in pois file</p></li>
+</ul>
+</dd></dl>
+
+<p><strong>write_daysim_files</strong> then outputs the final tables according to user specification.</p>
+<span class="target" id="module-netbuffer.abm.models.write_daysim_files"></span><dl class="py function">
+<dt id="netbuffer.abm.models.write_daysim_files.write_daysim_files">
+<code class="sig-prename descclassname">netbuffer.abm.models.write_daysim_files.</code><code class="sig-name descname">write_daysim_files</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#netbuffer.abm.models.write_daysim_files.write_daysim_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pipeline step that writes formatted output files.</p>
+<p>Specify in daysim_files.yaml to output pipeline tables:</p>
+<dl class="simple">
+<dt>nearby_zones:</dt><dd><ul class="simple">
+<li><p>outfile: filename</p></li>
+<li><p>delimiter: ‘comma’, ‘space’, or ‘tab’</p></li>
+<li><p>header: bool, whether to include column headers</p></li>
+<li><p>cols: list of columns from nearby zones to include.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Nearby zones column options are ‘from’, ‘to’, ‘distance’,
+‘net_node_dist’, ‘net_node_dist_to_zone’, ‘total_dist’.</p>
+<dl class="simple">
+<dt>buffered_zones:</dt><dd><ul class="simple">
+<li><p>outfile: filename</p></li>
+<li><p>delimiter: ascii code</p></li>
+<li><p>header: bool</p></li>
+<li><p>cols: list of columns to include from buffered zones.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Buffered zone column names must match the input zones table.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="netbuffer.abm.models.write_daysim_files.write_pipeline_table">
+<code class="sig-prename descclassname">netbuffer.abm.models.write_daysim_files.</code><code class="sig-name descname">write_pipeline_table</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_settings</span></em>, <em class="sig-param"><span class="n">pipeline_table</span></em><span class="sig-paren">)</span><a class="headerlink" href="#netbuffer.abm.models.write_daysim_files.write_pipeline_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes output files according to user settings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>file_settings</strong><span class="classifier">dict</span></dt><dd><p>cols : pipeline_table columns to include in output
+delimiter : str, either ‘comma’, ‘space’, or ‘tab’
+col_types : dict, col/type mapping (python or numpy dtypes)
+outfile : output file name
+header : bool, whether to include header row in output</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Each network model is independent and can be run separately. Configuration is described in the
+following section.</p>
+</div>
+<div class="section" id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Permalink to this headline">¶</a></h2>
+<p>The following describes the example model setup.</p>
+<div class="section" id="folder-and-file-setup">
+<h3>Folder and File Setup<a class="headerlink" href="#folder-and-file-setup" title="Permalink to this headline">¶</a></h3>
+<p>The example has the following root folder/file setup:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>configs - settings, expressions files, etc.</p></li>
+<li><p>data - input data such as the zones CSV, the POI CSV, and saved network H5</p></li>
+<li><p>output - outputs folder</p></li>
+<li><p>run_netbuffer.py - main script to run the model</p></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="configuration">
+<h3>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">configs</span></code> folder contains settings, expressions files, and other files required for specifying
+model utilities and form.  The first place to start in the <code class="docutils literal notranslate"><span class="pre">configs</span></code> folder is <code class="docutils literal notranslate"><span class="pre">settings.yaml</span></code>, which
+is the main settings file for the model run.  This file includes:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">models</span></code> - list of model steps to run</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">input_table_list</span></code> - input file name and index column for the initial zone table</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">network</span></code> - instruction for sourcing the Pandana network (‘read’, ‘build’, or ‘download’)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">max_dist</span></code> - maximum network search distance (in meters) for calculating nearby zones and POIs</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">zones_lon</span></code>, <code class="docutils literal notranslate"><span class="pre">zones_lat</span></code> - columns to use for latitude/longitude in zones input file</p></li>
+</ul>
+<p>The <code class="docutils literal notranslate"><span class="pre">buffer_zones.yaml</span></code> file provides instructions to the buffer_zones step.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">buffer_zones_spec</span></code> - filename for the user-defined network expressions</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pois</span></code> - Point of Interest file name</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CONSTANTS</span></code> - variables that are made available to the Python interpreter when evaluating the
+expressions from <code class="docutils literal notranslate"><span class="pre">buffer_zones_spec</span></code>. The following constants are required:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">max_pois</span></code> - number of POIs to look for around each zone. E.x. <code class="docutils literal notranslate"><span class="pre">max_pois:</span> <span class="pre">1</span></code> will find only the closest bus stop in a given zone</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pois-x</span></code> - the longitude column in the POI file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pois-y</span></code> - the latitude column in the POI file</p></li>
+</ul>
+</li>
+</ul>
+<p><a class="reference external" href="https://activitysim.github.io/activitysim/core.html#utility-expressions">Read more</a> on
+expressions files in the ActivitySim framework.</p>
+</div>
+<div class="section" id="network">
+<h3>Network<a class="headerlink" href="#network" title="Permalink to this headline">¶</a></h3>
+<p>Netbuffer uses a <a class="reference external" href="http://udst.github.io/pandana/index.html">Pandana network</a> for the majority of
+the heavy lifting. This network must be loaded at the program’s start and can be sourced in three
+different ways via the <code class="docutils literal notranslate"><span class="pre">network</span></code> flag in <code class="docutils literal notranslate"><span class="pre">settings.yaml</span></code>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">download</span></code> - calculates a geographic area from the input zones table and
+download a network from the Open Street Map API. Netbuffer will then save a file in the outputs
+folder named <cite>pandana_network.h5</cite> which can be used for subsequent model runs.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">read</span></code> - loads a network from a saved H5 file. Be sure to use a network that
+geographically matches the input zones/POIs. This option requires an additional <code class="docutils literal notranslate"><span class="pre">saved_network</span></code>
+flag specifying the input file name.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">build</span></code> - creates a network from a set of nodes and links files. Requires an additional
+<code class="docutils literal notranslate"><span class="pre">network_settings_file</span></code> configuration setting. See <code class="docutils literal notranslate"><span class="pre">example_psrc</span></code> for more details.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Netbuffer uses Pandana’s default distance unit <em>meters</em>. All distances in the input tables,
+expressions, and configs are assumed to be in meters.</p>
+</div>
+<span class="target" id="module-netbuffer.core.network"></span><dl class="py function">
+<dt id="netbuffer.core.network.network">
+<code class="sig-prename descclassname">netbuffer.core.network.</code><code class="sig-name descname">network</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">zone_data</span></em>, <em class="sig-param"><span class="n">settings</span></em><span class="sig-paren">)</span><a class="headerlink" href="#netbuffer.core.network.network" title="Permalink to this definition">¶</a></dt>
+<dd><p>Injected Pandana Network object containing network
+node and edge data.</p>
+<p>User can specify three ‘network’ options in settings.yaml:</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>network: read</dt><dd><p>uses an existing saved network HDF5 file specified by
+and additional ‘saved_network’ setting</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>network: build</dt><dd><p>creates a new network using a set of node and link files
+specified in an additional ‘network_settings_file’.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>network: download</dt><dd><p>downloads a complete network from Open Street Maps using
+the ‘max_dist’ setting and the zone latitudes/longitudes
+found in the zone_data table.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="netbuffer.core.network.read_network_file">
+<code class="sig-prename descclassname">netbuffer.core.network.</code><code class="sig-name descname">read_network_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">settings</span></em><span class="sig-paren">)</span><a class="headerlink" href="#netbuffer.core.network.read_network_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read network from saved HDF5 file</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="netbuffer.core.network.get_osm_network">
+<code class="sig-prename descclassname">netbuffer.core.network.</code><code class="sig-name descname">get_osm_network</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">zone_data</span></em>, <em class="sig-param"><span class="n">settings</span></em><span class="sig-paren">)</span><a class="headerlink" href="#netbuffer.core.network.get_osm_network" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve Pandana network from Open Street Maps</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="netbuffer.core.network.build_network">
+<code class="sig-prename descclassname">netbuffer.core.network.</code><code class="sig-name descname">build_network</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">settings</span></em><span class="sig-paren">)</span><a class="headerlink" href="#netbuffer.core.network.build_network" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a Pandana network from CSV files</p>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="gettingstarted.html" class="btn btn-neutral float-left" title="Getting Started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright contributing authors
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
