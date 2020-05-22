@@ -5,8 +5,11 @@ Example
 =======
 
 This page describes the example model design and how to setup and run the Nashville
-regional example.
+regional example.  The Nashville example does three things:
 
+  * nearby_zones - calculates nearby zone-to-zone network distances
+  * buffer_zones - calculates network accessibility (buffer) variables 
+  * write_daysim_files - writes DaySim formatted output files
 
 .. index:: tutorial
 .. index:: example
@@ -20,24 +23,24 @@ Netbuffer contains two network models and one output model:
   * buffer_zones
   * write_daysim_files
 
-The main input for the network models is CSV file containing zone data. This file is called
+The main input for the network models is a CSV file containing zone data. This file is called
 ``zones_sample.csv`` in the Nashville example.
 
-**nearby_zones** calculates the nearby zones for each zone in the input file within a given distance
-(distance is network distance). It does this by finding the nearest network node for each zone,
-using Pandana's ``nearest_pois`` algorithm to find the nearest network nodes.
+**nearby_zones** calculates the nearby zones for each zone in the input file within a given network distance. 
+It does this by finding the nearest network node for each zone, using Pandana's ``nearest_pois`` algorithm to 
+find the nearest network nodes.
 
 .. automodule:: netbuffer.abm.models.nearby_zones
    :members:
 
 **buffer_zones** takes two additional input files -- a POI (Point of Interest) file and a Python
-expressions file -- and performs custom operations on the zone data to calculate additional
+expressions file, and performs custom operations on the zone data to calculate network buffer / accessibility 
 attributes for each input zone.
 
 .. automodule:: netbuffer.abm.models.buffer_zones
    :members:
 
-**write_daysim_files** then outputs the final tables according to user specification.
+**write_daysim_files** then outputs the final tables according to the formats required for input to DaySim.
 
 .. automodule:: netbuffer.abm.models.write_daysim_files
   :members:
