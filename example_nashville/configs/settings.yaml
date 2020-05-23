@@ -20,5 +20,5 @@ models:
   - buffer_zones
   - write_daysim_files
 
-resume_after: buffer_zones
+# resume_after: buffer_zones
 
