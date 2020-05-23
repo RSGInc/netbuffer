@@ -164,7 +164,14 @@
   <div class="section" id="example">
 <span id="id1"></span><h1>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h1>
 <p>This page describes the example model design and how to setup and run the Nashville
-regional example.</p>
+regional example.  The Nashville example does three things:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>nearby_zones - calculates nearby zone-to-zone network distances</p></li>
+<li><p>buffer_zones - calculates network accessibility (buffer) variables</p></li>
+<li><p>write_daysim_files - writes DaySim formatted output files</p></li>
+</ul>
+</div></blockquote>
 <span class="target" id="index-0"></span><div class="section" id="example-model-design">
 <span id="index-1"></span><h2>Example Model Design<a class="headerlink" href="#example-model-design" title="Permalink to this headline">¶</a></h2>
 <p>Netbuffer contains two network models and one output model:</p>
@@ -175,11 +182,11 @@ regional example.</p>
 <li><p>write_daysim_files</p></li>
 </ul>
 </div></blockquote>
-<p>The main input for the network models is CSV file containing zone data. This file is called
+<p>The main input for the network models is a CSV file containing zone data. This file is called
 <code class="docutils literal notranslate"><span class="pre">zones_sample.csv</span></code> in the Nashville example.</p>
-<p><strong>nearby_zones</strong> calculates the nearby zones for each zone in the input file within a given distance
-(distance is network distance). It does this by finding the nearest network node for each zone,
-using Pandana’s <code class="docutils literal notranslate"><span class="pre">nearest_pois</span></code> algorithm to find the nearest network nodes.</p>
+<p><strong>nearby_zones</strong> calculates the nearby zones for each zone in the input file within a given network distance.
+It does this by finding the nearest network node for each zone, using Pandana’s <code class="docutils literal notranslate"><span class="pre">nearest_pois</span></code> algorithm to
+find the nearest network nodes.</p>
 <span class="target" id="module-netbuffer.abm.models.nearby_zones"></span><dl class="py function">
 <dt id="netbuffer.abm.models.nearby_zones.nearby_zones">
 <code class="sig-prename descclassname">netbuffer.abm.models.nearby_zones.</code><code class="sig-name descname">nearby_zones</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">zone_data</span></em>, <em class="sig-param"><span class="n">network</span></em>, <em class="sig-param"><span class="n">settings</span></em><span class="sig-paren">)</span><a class="headerlink" href="#netbuffer.abm.models.nearby_zones.nearby_zones" title="Permalink to this definition">¶</a></dt>
@@ -210,7 +217,7 @@ column[i*2]: zone id for ith closest poi</p>
 </dd></dl>
 
 <p><strong>buffer_zones</strong> takes two additional input files – a POI (Point of Interest) file and a Python
-expressions file – and performs custom operations on the zone data to calculate additional
+expressions file, and performs custom operations on the zone data to calculate network buffer / accessibility
 attributes for each input zone.</p>
 <span class="target" id="module-netbuffer.abm.models.buffer_zones"></span><dl class="py function">
 <dt id="netbuffer.abm.models.buffer_zones.buffer_zones">
@@ -237,7 +244,7 @@ nearest bus stop from each zone.</p>
 </ul>
 </dd></dl>
 
-<p><strong>write_daysim_files</strong> then outputs the final tables according to user specification.</p>
+<p><strong>write_daysim_files</strong> then outputs the final tables according to the formats required for input to DaySim.</p>
 <span class="target" id="module-netbuffer.abm.models.write_daysim_files"></span><dl class="py function">
 <dt id="netbuffer.abm.models.write_daysim_files.write_daysim_files">
 <code class="sig-prename descclassname">netbuffer.abm.models.write_daysim_files.</code><code class="sig-name descname">write_daysim_files</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#netbuffer.abm.models.write_daysim_files.write_daysim_files" title="Permalink to this definition">¶</a></dt>
